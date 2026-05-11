@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Day Pallavolo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --border: #E8E6DF;
+    --border-strong: #D0CEC5;
+    --text: #1A1916;
+    --text-secondary: #6B6960;
+    --text-tertiary: #A8A69E;
+    --accent: #2D5A3D;
+    --accent-light: #EAF2ED;
+    --accent-text: #1D3D29;
+    --gold: #C8952A;
+    --gold-light: #FBF4E6;
+    --danger: #C0392B;
+    --danger-light: #FDECEA;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+
+  header {
+    background: var(--accent);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header .logo {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  header .subtitle {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 1px;
+  }
+
+  header .back-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+  }
+
+  header .back-btn:hover { background: rgba(255,255,255,0.25); }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 24px 16px; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card.static { cursor: default; }
+  .card.static:hover { transform: none; border-color: var(--border); }
+
+  .athlete-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .athlete-info { flex: 1; min-width: 0; }
+  .athlete-name { font-weight: 600; font-size: 15px; }
+  .athlete-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 9px;
+    border-radius: 20px;
+    background: var(--accent-light);
+    color: var(--accent-text);
+  }
+
+  .badge.gold {
+    background: var(--gold-light);
+    color: #7A5A18;
+  }
+
+  .chevron { color: var(--text-tertiary); font-size: 18px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    margin: 20px 0 8px;
+  }
+
+  .detail-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .detail-header .name {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .info-item .label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 2px; }
+  .info-item .value { font-size: 14px; font-weight: 500; }
+
+  .photo-box {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-box .no-photo { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--text-tertiary); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    border: none;
+  }
+
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover { opacity: 0.9; }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+  }
+
+  .btn-secondary:hover { background: var(--bg); }
+
+  .skill-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 8px;
+  }
+
+  .skill-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .skill-name { font-size: 14px; font-weight: 500; }
+
+  .stars { display: flex; gap: 6px; }
+
+  .star {
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--border-strong);
+    transition: color 0.1s, transform 0.1s;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .star.on { color: var(--gold); }
+  .star:hover { transform: scale(1.15); }
+
+  select, input, textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+
+  textarea { resize: vertical; min-height: 70px; }
+
+  .val-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+
+  .val-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .val-coach { font-size: 14px; font-weight: 600; }
+
+  .skill-result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .skill-result-row:last-child { border-bottom: none; }
+  .skill-result-name { color: var(--text-secondary); }
+
+  .stars-display { color: var(--gold); letter-spacing: -2px; font-size: 14px; }
+  .stars-empty { color: var(--border-strong); }
+
+  .avg-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    color: #7A5A18;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  .global-avg {
+    background: var(--accent-light);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .global-avg .big-avg {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent-text);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .global-avg .avg-label {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-box {
+    background: var(--danger-light);
+    color: var(--danger);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .success-box {
+    background: var(--accent-light);
+    color: var(--accent-text);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--text-tertiary);
+    font-size: 14px;
+  }
+
+  .form-msg { font-size: 13px; margin-top: 10px; }
+
+  @media (max-width: 480px) {
+    .container { padding: 16px 12px; }
+    .stars { gap: 4px; }
+    .star { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" id="back-btn" onclick="goBack()">&#8592; Indietro</button>
+  <div>
+    <div class="logo">&#127944; Open Day</div>
+    <div class="subtitle" id="header-subtitle">Pallavolo</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div id="screen-list" class="screen active">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--text-secondary);" id="list-count"></div>
+      <button class="btn btn-secondary" onclick="loadData()" style="padding:8px 14px;font-size:13px;">&#8635; Aggiorna</button>
+    </div>
+    <div id="athletes-list"><div class="loading"><div class="spinner"></div>Caricamento atleti...</div></div>
+  </div>
+
+  <div id="screen-athlete" class="screen">
+    <div id="athlete-detail"></div>
+  </div>
+
+  <div id="screen-form" class="screen">
+    <div id="form-content"></div>
+  </div>
+
+</div>
+
+<script>
+const BASE_ID = "appxf7pgODaVZNvqI";
+const TOKEN = "pat2yDSGOEsMhxWSz.377c288614640e6e59d90d2fa394545d1082e00fd024c84aeab3336d2255784b";
+const HEADERS = { "Authorization": "Bearer " + TOKEN, "Content-Type": "application/json" };
+
+let athletes = [], coaches = [], valuations = [];
+let currentAthleteId = null;
+let ratings = {}, noteCategoria = "", noteFinale = "";
+
+const generalSkills = ["Bagher", "Palleggio", "Battuta", "Atletismo generale", "Attacco"];
+const roleSkills = {
+  "Banda": ["Rincorsa", "Variazione direzioni"],
+  "Opposto": ["Rincorsa", "Variazione direzioni"],
+  "Palleggiatore": ["Precisione alzata"],
+  "Centrale": ["Variazione tempi", "Muro"],
+  "Libero": ["Appoggi", "Bagher di difesa"]
+};
+
+async function airtableGet(table, filter) {
+  let url = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}?pageSize=100`;
+  if (filter) url += "&filterByFormula=" + encodeURIComponent(filter);
+  const r = await fetch(url, { headers: HEADERS });
+  if (!r.ok) throw new Error(r.status);
+  return await r.json();
+}
+
+async function airtablePost(table, fields) {
+  const r = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}`, {
+    method: "POST", headers: HEADERS, body: JSON.stringify({ fields })
+  });
+  return await r.json();
+}
+
+async function loadData() {
+  document.getElementById("athletes-list").innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
+  document.getElementById("list-count").textContent = "";
+  try {
+    const [aRes, cRes, vRes] = await Promise.all([
+      airtableGet("Atleti"),
+      airtableGet("Allenatori"),
+      airtableGet("Valutazioni")
+    ]);
+    athletes = aRes.records || [];
+    coaches = cRes.records || [];
+    valuations = vRes.records || [];
+    renderList();
+  } catch(e) {
+    document.getElementById("athletes-list").innerHTML = `<div class="error-box">&#9888; Errore di connessione ad Airtable. Verifica la connessione internet e riprova.</div>`;
+  }
+}
+
+function initials(name, surname) {
+  return ((name||"")[0]||"").toUpperCase() + ((surname||"")[0]||"").toUpperCase();
+}
+
+function getAthleteVals(athleteId) {
+  return valuations.filter(v => v.fields["Atleta"] && v.fields["Atleta"].includes(athleteId));
+}
+
+function calcAvg(vals, role) {
+  const skills = [...generalSkills, ...(roleSkills[role] || [])];
+  const all = [];
+  vals.forEach(v => skills.forEach(s => { if (v.fields[s]) all.push(v.fields[s]); }));
+  if (!all.length) return null;
+  return (all.reduce((a,b)=>a+b,0)/all.length).toFixed(1);
+}
+
+function renderList() {
+  const container = document.getElementById("athletes-list");
+  document.getElementById("list-count").textContent = athletes.length + " atleti";
+  if (!athletes.length) {
+    container.innerHTML = '<div class="empty-state">Nessun atleta trovato su Airtable.</div>';
+    return;
+  }
+  container.innerHTML = athletes.map(a => {
+    const f = a.fields;
+    const vals = getAthleteVals(a.id);
+    const avg = calcAvg(vals, f["Ruolo"]);
+    return `<div class="card" onclick="showAthlete('${a.id}')">
+      <div class="athlete-row">
+        <div class="avatar">${initials(f["Name"], f["Cognome"])}</div>
+        <div class="athlete-info">
+          <div class="athlete-name">${f["Name"]||""} ${f["Cognome"]||""}</div>
+          <div class="athlete-meta">
+            ${f["Ruolo"] ? `<span class="badge">${f["Ruolo"]}</span> ` : ""}
+            ${f["Livello"] ? `<span class="badge gold">${f["Livello"]}</span> ` : ""}
+            ${f["Altezza"] ? f["Altezza"]+" cm · " : ""}
+            ${vals.length} valutazion${vals.length===1?"e":"i"}
+            ${avg ? ` · &#9733; ${avg}` : ""}
+          </div>
+        </div>
+        <span class="chevron">&#8250;</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function showAthlete(id) {
+  currentAthleteId = id;
+  const a = athletes.find(x => x.id === id);
+  if (!a) return;
+  const f = a.fields;
+  const vals = getAthleteVals(id);
+  const avg = calcAvg(vals, f["Ruolo"]);
+  const roleSpecific = roleSkills[f["Ruolo"]] || [];
+
+  let photoHtml = `<div class="photo-box"><div class="no-photo">&#128100;</div></div>`;
+  if (f["Foto"] && f["Foto"][0] && f["Foto"][0].url) {
+    photoHtml = `<div class="photo-box"><img src="${f["Foto"][0].url}" alt="${f["Name"]}"></div>`;
+  }
+
+  let valsHtml = "";
+  if (avg) {
+    valsHtml += `<div class="global-avg">
+      <div class="big-avg">&#9733; ${avg}</div>
+      <div><div class="avg-label">Media generale</div><div style="font-size:13px;color:var(--accent);">${vals.length} valutazion${vals.length===1?"e":"i"}</div></div>
+    </div>`;
+  }
+
+  if (vals.length) {
+    valsHtml += `<div class="section-label">Valutazioni ricevute</div>`;
+    vals.forEach(v => {
+      const coachId = v.fields["Allenatore"] && v.fields["Allenatore"][0];
+      const coach = coaches.find(c => c.id === coachId);
+      const coachName = coach ? coach.fields["Name"] : "—";
+      const allR = [...generalSkills, ...roleSpecific].map(s => v.fields[s]).filter(Boolean);
+      const vAvg = allR.length ? (allR.reduce((a,b)=>a+b,0)/allR.length).toFixed(1) : "—";
+
+      valsHtml += `<div class="val-card">
+        <div class="val-header">
+          <div class="val-coach">${coachName}</div>
+          <div class="avg-circle">&#9733; ${vAvg}</div>
+        </div>
+        ${[...generalSkills, ...roleSpecific].map(s => {
+          if (!v.fields[s]) return "";
+          const n = v.fields[s];
+          return `<div class="skill-result-row">
+            <span class="skill-result-name">${s}</span>
+            <span><span class="stars-display">${"★".repeat(n)}</span><span class="stars-empty">${"★".repeat(5-n)}</span></span>
+          </div>`;
+        }).join("")}
+        ${v.fields["Nota Finale"] ? `<div style="font-size:12px;color:var(--text-secondary);margin-top:8px;font-style:italic;">"${v.fields["Nota Finale"]}"</div>` : ""}
+      </div>`;
+    });
+  } else {
+    valsHtml += `<div class="empty-state">Nessuna valutazione ancora.</div>`;
+  }
+
+  document.getElementById("athlete-detail").innerHTML = `
+    <div class="detail-header">
+      <div style="display:flex;align-items:flex-start;gap:14px;">
+        ${photoHtml}
+        <div style="flex:1;">
+          <div class="name">${f["Name"]||""} ${f["Cognome"]||""}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+            ${f["Ruolo"] ? `<span class="badge">${f["Ruolo"]}</span>` : ""}
+            ${f["Livello"] ? `<span class="badge gold">${f["Livello"]}</span>` : ""}
+            ${f["Tipologia"] ? `<span class="badge" style="background:var(--bg);">${Array.isArray(f["Tipologia"]) ? f["Tipologia"].join(", ") : f["Tipologia"]}</span>` : ""}
+          </div>
+        </div>
+      </div>
+      <div class="info-grid">
+        ${f["Anno di Nascita"] ? `<div class="info-item"><div class="label">Anno di nascita</div><div class="value">${f["Anno di Nascita"]}</div></div>` : ""}
+        ${f["Altezza"] ? `<div class="info-item"><div class="label">Altezza</div><div class="value">${f["Altezza"]} cm</div></div>` : ""}
+        ${f["Esperienza precedente"] ? `<div class="info-item"><div class="label">Club precedente</div><div class="value">${f["Esperienza precedente"]}</div></div>` : ""}
+        ${f["Mano dominante"] ? `<div class="info-item"><div class="label">Mano</div><div class="value">${f["Mano dominante"]}</div></div>` : ""}
+        ${f["Livello"] ? `<div class="info-item"><div class="label">Livello</div><div class="value">${f["Livello"]}</div></div>` : ""}
+        ${f["Tipologia"] ? `<div class="info-item"><div class="label">Tipologia</div><div class="value">${Array.isArray(f["Tipologia"]) ? f["Tipologia"].join(", ") : f["Tipologia"]}</div></div>` : ""}
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="showForm('${id}')" style="width:100%;justify-content:center;margin-bottom:4px;">+ Aggiungi valutazione</button>
+    ${valsHtml}
+  `;
+
+  setScreen("screen-athlete", f["Name"] + " " + (f["Cognome"]||""), true);
+}
+
+function showForm(athleteId) {
+  currentAthleteId = athleteId;
+  ratings = {}; noteCategoria = ""; noteFinale = "";
+  const a = athletes.find(x => x.id === athleteId);
+  const f = a ? a.fields : {};
+  const roleSpecific = roleSkills[f["Ruolo"]] || [];
+
+  const coachOptions = coaches.map(c => `<option value="${c.id}">${c.fields["Name"]}</option>`).join("");
+
+  let skillsHtml = `<div class="section-label">Skill generali</div>`;
+  generalSkills.forEach(s => { skillsHtml += makeSkillBlock(s); });
+
+  if (roleSpecific.length) {
+    skillsHtml += `<div class="section-label">Skill specifiche — ${f["Ruolo"]}</div>`;
+    roleSpecific.forEach(s => { skillsHtml += makeSkillBlock(s); });
+  }
+
+  document.getElementById("form-content").innerHTML = `
+    <div style="font-size:16px;font-weight:600;margin-bottom:16px;">${f["Name"]||""} ${f["Cognome"]||""}</div>
+    <div class="section-label">Allenatore</div>
+    <select id="coach-select" style="margin-bottom:4px;">
+      <option value="">— seleziona allenatore —</option>
+      ${coachOptions}
+    </select>
+    ${skillsHtml}
+    <div class="section-label">Note per categoria</div>
+    <input type="text" id="note-cat" placeholder="Note sulle skill valutate..." style="margin-bottom:4px;" oninput="noteCategoria=this.value">
+    <div class="section-label">Nota finale</div>
+    <textarea id="note-fin" placeholder="Impressioni generali, potenziale, aspetti da sviluppare..." oninput="noteFinale=this.value"></textarea>
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="submitForm()" id="save-btn" style="width:100%;justify-content:center;">&#10003; Salva valutazione</button>
+      <div class="form-msg" id="form-msg"></div>
+    </div>
+  `;
+
+  setScreen("screen-form", "Nuova valutazione", true);
+}
+
+function makeSkillBlock(name) {
+  const safeId = "stars_" + name.replace(/[^a-zA-Z0-9]/g, "_");
+  return `<div class="skill-block">
+    <div class="skill-row">
+      <span class="skill-name">${name}</span>
+      <div class="stars" id="${safeId}">
+        ${[1,2,3,4,5].map(i => `<span class="star" onclick="setRating('${name}',${i},'${safeId}')">&#9733;</span>`).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+function setRating(skill, val, containerId) {
+  ratings[skill] = val;
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.querySelectorAll(".star").forEach((s, i) => {
+    s.classList.toggle("on", i < val);
+  });
+}
+
+async function submitForm() {
+  const coachId = document.getElementById("coach-select").value;
+  const msg = document.getElementById("form-msg");
+  const btn = document.getElementById("save-btn");
+
+  if (!coachId) { msg.style.color = "var(--danger)"; msg.textContent = "Seleziona un allenatore."; return; }
+  if (!Object.keys(ratings).length) { msg.style.color = "var(--danger)"; msg.textContent = "Inserisci almeno una valutazione."; return; }
+
+  btn.disabled = true;
+  btn.textContent = "Salvataggio...";
+  msg.textContent = "";
+
+  const fields = {
+    "Atleta": [currentAthleteId],
+    "Allenatore": [coachId],
+    "Nota Categoria": noteCategoria,
+    "Nota Finale": noteFinale,
+    ...ratings
+  };
+
+  try {
+    const res = await airtablePost("Valutazioni", fields);
+    if (res.id) {
+      valuations.push(res);
+      msg.style.color = "var(--accent)";
+      msg.textContent = "✓ Valutazione salvata!";
+      btn.textContent = "✓ Salvato";
+      setTimeout(() => showAthlete(currentAthleteId), 1000);
+    } else {
+      btn.disabled = false;
+      btn.textContent = "✓ Salva valutazione";
+      msg.style.color = "var(--danger)";
+      msg.textContent = "Errore: " + ((res.error && res.error.message) || "riprova.");
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = "✓ Salva valutazione";
+    msg.style.color = "var(--danger)";
+    msg.textContent = "Errore di rete. Controlla la connessione.";
+  }
+}
+
+function setScreen(id, subtitle, showBack) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.getElementById("header-subtitle").textContent = subtitle || "Pallavolo";
+  document.getElementById("back-btn").style.display = showBack ? "inline-flex" : "none";
+}
+
+function goBack() {
+  const formActive = document.getElementById("screen-form").classList.contains("active");
+  if (formActive) { showAthlete(currentAthleteId); }
+  else { setScreen("screen-list", "Pallavolo", false); renderList(); }
+}
+
+loadData();
+</script>
+</body>
+</html>
