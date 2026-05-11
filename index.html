@@ -33,14 +33,13 @@
 
 body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; -webkit-font-smoothing: antialiased; }
 
-header { background: var(--accent); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
-.header-rainbow { height: 3px; background: var(--grad2); }
-.header-inner { display: flex; align-items: center; gap: 14px; padding: 10px 20px; max-width: 720px; margin: 0 auto; }
+header { position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 16px rgba(0,0,0,0.22); }
+.header-img { width: 100%; max-height: 80px; object-fit: cover; object-position: center; display: block; }
+.header-inner { display: flex; align-items: center; gap: 14px; padding: 8px 20px; max-width: 720px; margin: 0 auto; position: absolute; top: 0; left: 0; right: 0; }
 .header-logo-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
-.header-logo-img { width: 44px; height: 44px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: white; display: flex; align-items: center; justify-content: center; }
 .header-text { line-height: 1.2; }
-.header-brand { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
-.header-sub { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+.header-brand { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.02em; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+.header-sub { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
 
 .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; display: none; align-items: center; gap: 6px; transition: background 0.15s; white-space: nowrap; }
 .back-btn:hover { background: rgba(255,255,255,0.18); }
@@ -172,28 +171,10 @@ textarea.note-input { resize: vertical; min-height: 80px; }
 <body>
 
 <header>
-  <div class="header-rainbow"></div>
+  <img class="header-img" src="gatevolley.jpg" alt="Gate Volley Milano">
   <div class="header-inner">
     <button class="back-btn" id="back-btn" onclick="goBack()">&#8592; Indietro</button>
-    <div class="header-logo-wrap">
-      <div class="header-logo-img">
-        <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="avlg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#e63946"/>
-              <stop offset="50%" style="stop-color:#4caf50"/>
-              <stop offset="100%" style="stop-color:#2196f3"/>
-            </linearGradient>
-          </defs>
-          <circle cx="50" cy="50" r="46" fill="none" stroke="url(#avlg)" stroke-width="5"/>
-          <text x="50" y="64" font-family="Inter,sans-serif" font-weight="800" font-size="40" fill="#1A1A2E" text-anchor="middle">GV</text>
-        </svg>
-      </div>
-      <div class="header-text">
-        <div class="header-brand">GATE VOLLEY</div>
-        <div class="header-sub">Open Day · Milano</div>
-      </div>
-    </div>
+    <div class="header-logo-wrap"></div>
   </div>
 </header>
 
