@@ -393,6 +393,7 @@ function showAthlete(id) {
           </div>
         </div>
         <div class="info-grid">
+          ${f["Ruolo"] ? `<div class="info-item"><div class="lbl">Ruolo</div><div class="val">${f["Ruolo"]}</div></div>` : ""}
           ${f["Anno di Nascita"] ? `<div class="info-item"><div class="lbl">Nato</div><div class="val">${f["Anno di Nascita"]}</div></div>` : ""}
           ${f["Altezza"] ? `<div class="info-item"><div class="lbl">Altezza</div><div class="val">${f["Altezza"]} cm</div></div>` : ""}
           ${f["Esperienza precedente"] ? `<div class="info-item"><div class="lbl">Esperienza</div><div class="val">${f["Esperienza precedente"]}</div></div>` : ""}
