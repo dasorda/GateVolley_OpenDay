@@ -513,6 +513,7 @@ function setScreen(id, showBack) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   document.getElementById("back-btn").classList.toggle("visible", !!showBack);
+  document.getElementById("fab").style.display = (id === "screen-list") ? "block" : "none";
 }
 
 function goBack() {
