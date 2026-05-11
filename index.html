@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gate Volley Milano — Open Day</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -24,151 +22,148 @@
   --gold: #E8A020;
   --gold-bg: #FEF7EA;
   --danger: #D63031;
+  --danger-bg: #FFF0F0;
   --success: #00B894;
+  --success-bg: #F0FDF8;
   --r: 10px;
   --r-lg: 16px;
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
 }
 
-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 15px;
-}
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; -webkit-font-smoothing: antialiased; }
 
-/* HEADER */
-header {
-  background: var(--bg);
-  padding: 12px 16px 0;
-}
+header { background: var(--bg); padding: 12px 16px 0; }
+.header-img-wrap { max-width: 720px;  margin: 0 auto; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-height: 220px; }
+.header-img { width: 100%;  height: auto; display: block; }
 
-.header-img-wrap {
-  max-width: 720px;
-  margin: 0 auto;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
+.back-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; display: none; align-items: center; gap: 6px; transition: background 0.15s; margin-bottom: 14px; box-shadow: var(--shadow); }
+.back-btn:hover { background: var(--bg); }
+.back-btn.visible { display: inline-flex; }
 
-.header-img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* CONTAINER */
-.container {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 20px 16px 40px;
-}
-
+.container { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; }
 .screen { display: none; }
 .screen.active { display: block; }
 
-/* BACK */
-.back-btn {
-  display: none;
-  margin-bottom: 14px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: white;
-}
-
-/* =========================
-   FILTRI NUOVI (A LIVELLI)
-========================= */
-
-.filters-toggle-wrap {
-  margin-bottom: 10px;
-}
-
-.main-filter-btn,
-.more-filters-btn {
-  width: 100%;
-  padding: 11px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-}
-
-.filters-wrap {
-  display: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 14px;
-  box-shadow: var(--shadow);
-  margin-bottom: 12px;
-}
-
-.search-wrap {
-  position: relative;
-}
-
-.search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.search-input {
-  width: 100%;
-  padding: 10px 10px 10px 34px;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-}
-
-.hidden { display: none; }
-
-.filter-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.pill {
-  padding: 6px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.pill.active {
-  background: var(--accent);
-  color: white;
-}
+/* FILTRI */
+.filters-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px 16px; margin-bottom: 14px; box-shadow: var(--shadow); }
+.search-wrap { position: relative; margin-bottom: 10px; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 15px; pointer-events: none; }
+.search-input { width: 100%; padding: 10px 14px 10px 38px; border: 1px solid var(--border); border-radius: var(--r); font-family: inherit; font-size: 14px; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
+.search-input:focus { border-color: #7b2ff7; }
+.filter-group { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+.filter-group:last-child { margin-bottom: 0; }
+.filter-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 2px; }
+.pill { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.pill:hover { border-color: #7b2ff7; color: #7b2ff7; }
+.pill.active { background: var(--accent); color: white; border-color: var(--accent); }
 
 /* LISTA */
-.athletes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.athletes-list { display: flex; flex-direction: column; gap: 6px; }
+.list-meta { font-size: 12px; color: var(--text3); font-weight: 500; margin-bottom: 10px; }
+
+.athlete-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 13px 16px; cursor: pointer; display: flex; align-items: center; gap: 14px; transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s; box-shadow: var(--shadow); }
+.athlete-item:hover { border-color: #7b2ff7; box-shadow: 0 4px 20px rgba(123,47,247,0.10); transform: translateY(-1px); }
+
+.avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; position: relative; }
+.avatar::before { content: ''; position: absolute; inset: -2px; border-radius: 50%; background: linear-gradient(135deg,#e63946,#e07b39,#e8c84a,#4caf50,#2196f3,#7b2ff7); z-index: 0; }
+.avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; position: relative; z-index: 1; }
+
+.athlete-info { flex: 1; min-width: 0; }
+.athlete-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.athlete-meta { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+
+.badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.badge-role { background: #EEE8FF; color: #5B21B6; }
+.badge-level { background: var(--gold-bg); color: #92400E; }
+.badge-tipo { background: #E0F2FE; color: #0369A1; }
+
+.athlete-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.avg-chip { display: flex; align-items: center; gap: 3px; background: var(--gold-bg); color: #92400E; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.val-count { font-size: 11px; color: var(--text3); }
+.chevron { color: var(--text3); font-size: 16px; }
+
+/* SCHEDA ATLETA */
+.athlete-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow); }
+.hero-stripe { height: 4px; background: var(--grad2); }
+.hero-body { padding: 18px 20px; }
+.hero-top { display: flex; align-items: flex-start; gap: 16px; }
+.photo-box { width: 80px; height: 80px; border-radius: var(--r); overflow: hidden; flex-shrink: 0; background: var(--bg); border: 1px solid var(--border); }
+.photo-box img { width: 100%; height: 100%; object-fit: cover; }
+.photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 32px; background: linear-gradient(135deg, #EEE8FF, #E0F2FE); }
+.hero-name { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+.hero-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.info-item .lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 3px; }
+.info-item .val { font-size: 14px; font-weight: 600; color: var(--text); }
+
+.media-box { background: linear-gradient(135deg, var(--accent) 0%, #16213E 100%); border-radius: var(--r-lg); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: var(--shadow-md); }
+.media-big { font-size: 30px; font-weight: 700; color: white; }
+.media-star { font-size: 20px; color: #F6C90E; margin-right: 4px; }
+.media-label { font-size: 12px; color: rgba(255,255,255,0.55); margin-bottom: 2px; }
+.media-count { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 500; }
+
+.add-val-btn { width: 100%; padding: 14px; border-radius: var(--r-lg); background: linear-gradient(135deg,#e63946,#e07b39,#e8c84a,#4caf50,#2196f3,#7b2ff7); color: white; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; border: none; margin-bottom: 16px; transition: opacity 0.15s, transform 0.1s; box-shadow: var(--shadow-md); }
+.add-val-btn:hover { opacity: 0.92; }
+.add-val-btn:active { transform: scale(0.99); }
+
+.section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin: 18px 0 10px; }
+
+.val-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 10px; box-shadow: var(--shadow); }
+.val-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+.val-coach-name { font-size: 14px; font-weight: 600; }
+.val-avg-badge { background: var(--gold-bg); color: #92400E; font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+.val-skills { padding: 10px 16px; }
+.skill-result { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.skill-result:last-child { border-bottom: none; }
+.skill-result-name { color: var(--text2); font-weight: 500; }
+.stars-on { color: #F6C90E; letter-spacing: 1px; }
+.stars-off { color: var(--border-strong); letter-spacing: 1px; }
+.val-note { padding: 10px 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text2); font-style: italic; background: var(--surface2); }
+
+/* FORM */
+.form-header { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 14px; box-shadow: var(--shadow); }
+.form-athlete-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+
+.form-select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--r); font-family: inherit; font-size: 14px; background: var(--surface); color: var(--text); outline: none; transition: border-color 0.15s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A5A6A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+.form-select:focus { border-color: #7b2ff7; }
+
+.skill-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin: 16px 0 8px; display: flex; align-items: center; gap: 8px; }
+.role-tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #EEE8FF; color: #5B21B6; font-weight: 600; text-transform: none; letter-spacing: 0; }
+
+.skill-block { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r); padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: var(--shadow); transition: border-color 0.15s; }
+.skill-block.rated { border-color: #C4B5FD; background: #FAFAFF; }
+.skill-name { font-size: 14px; font-weight: 500; }
+
+.stars { display: flex; gap: 4px; }
+.star { font-size: 24px; cursor: pointer; color: var(--border-strong); transition: color 0.1s, transform 0.12s; line-height: 1; user-select: none; }
+.star:hover { transform: scale(1.2); }
+.star.on { color: #F6C90E; }
+
+.note-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--r); font-family: inherit; font-size: 14px; background: var(--surface); color: var(--text); outline: none; transition: border-color 0.15s; }
+.note-input:focus { border-color: #7b2ff7; }
+textarea.note-input { resize: vertical; min-height: 80px; }
+
+.save-btn { width: 100%; padding: 15px; border-radius: var(--r-lg); background: var(--accent); color: white; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; border: none; margin-top: 16px; transition: opacity 0.15s, transform 0.1s; }
+.save-btn:hover { opacity: 0.88; }
+.save-btn:active { transform: scale(0.99); }
+.save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.form-msg { font-size: 13px; margin-top: 10px; font-weight: 500; text-align: center; }
+
+.loading { text-align: center; padding: 48px 0; color: var(--text2); }
+.spinner { width: 28px; height: 28px; border: 2.5px solid var(--border); border-top-color: #7b2ff7; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 14px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 32px 0; color: var(--text3); font-size: 14px; }
+.error-box { background: var(--danger-bg); color: var(--danger); border-radius: var(--r); padding: 12px 16px; font-size: 13px; font-weight: 500; margin-bottom: 12px; }
+
+@media (max-width: 480px) {
+  .container { padding: 14px 12px 32px; }
+  .header-inner { padding: 10px 14px; }
+  .star { font-size: 20px; }
+  .hero-name { font-size: 19px; }
 }
-
-/* (tutto il resto del tuo CSS resta invariato — abbreviato qui per leggibilità) */
-
-.athlete-item {
-  background: white;
-  padding: 12px;
-  border-radius: var(--r-lg);
-  border: 1px solid var(--border);
-  cursor: pointer;
-}
-
 </style>
 </head>
-
 <body>
 
 <header>
@@ -178,98 +173,325 @@ header {
 </header>
 
 <div class="container">
+  <button class="back-btn" id="back-btn" onclick="goBack()">&#8592; Indietro</button>
 
-  <button class="back-btn" id="back-btn">← Indietro</button>
-
-  <!-- FILTRI -->
-  <div class="filters-toggle-wrap">
-    <button class="main-filter-btn" onclick="toggleFilters()">⚙️ Filtri</button>
-  </div>
-
-  <div class="filters-wrap" id="filters-wrap">
-
-    <!-- SEARCH -->
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input class="search-input" id="search-input" placeholder="Cerca nome..." oninput="applyFilters()">
-    </div>
-
-    <!-- ADV TOGGLE -->
-    <button class="more-filters-btn" onclick="toggleMore()">Mostra altri filtri</button>
-
-    <!-- ADV FILTERS -->
-    <div id="more-filters" class="hidden">
-
+  <div id="screen-list" class="screen active">
+    <div class="filters-wrap">
+      <div class="search-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input class="search-input" type="text" id="search-input" placeholder="Cerca per nome..." oninput="applyFilters()">
+      </div>
       <div class="filter-group">
+        <span class="filter-label">Ruolo</span>
         <button class="pill active" data-group="ruolo" data-val="" onclick="setPill(this)">Tutti</button>
         <button class="pill" data-group="ruolo" data-val="Banda" onclick="setPill(this)">Banda</button>
         <button class="pill" data-group="ruolo" data-val="Opposto" onclick="setPill(this)">Opposto</button>
         <button class="pill" data-group="ruolo" data-val="Palleggiatore" onclick="setPill(this)">Palleggiatore</button>
+        <button class="pill" data-group="ruolo" data-val="Centrale" onclick="setPill(this)">Centrale</button>
+        <button class="pill" data-group="ruolo" data-val="Libero" onclick="setPill(this)">Libero</button>
+        <button class="pill" data-group="ruolo" data-val="Universale" onclick="setPill(this)">Universale</button>
       </div>
-
       <div class="filter-group">
+        <span class="filter-label">Livello</span>
         <button class="pill active" data-group="livello" data-val="" onclick="setPill(this)">Tutti</button>
         <button class="pill" data-group="livello" data-val="Principiante" onclick="setPill(this)">Principiante</button>
+        <button class="pill" data-group="livello" data-val="Intermedio" onclick="setPill(this)">Intermedio</button>
         <button class="pill" data-group="livello" data-val="Avanzato" onclick="setPill(this)">Avanzato</button>
       </div>
-
+    </div>
+    <div class="list-meta" id="list-meta"></div>
+    <div class="athletes-list" id="athletes-list">
+      <div class="loading"><div class="spinner"></div>Caricamento atleti...</div>
     </div>
   </div>
 
-  <!-- LISTA -->
-  <div class="athletes-list" id="athletes-list">
-    <div class="loading">Caricamento...</div>
+  <div id="screen-athlete" class="screen">
+    <div id="athlete-detail"></div>
   </div>
 
-  <!-- QUI RESTA TUTTO IL RESTO DELLA TUA APP -->
-  <!-- (athlete screen, form screen, Airtable logic ecc. NON TOCCATI) -->
+  <div id="screen-form" class="screen">
+    <div id="form-content"></div>
+  </div>
 
 </div>
 
 <script>
+const BASE_ID = "appxf7pgODaVZNvqI";
+const TOKEN = "pat2yDSGOEsMhxWSz.377c288614640e6e59d90d2fa394545d1082e00fd024c84aeab3336d2255784b";
+const H = { "Authorization": "Bearer " + TOKEN, "Content-Type": "application/json" };
 
-/* FILTRI UI */
-let filterRuolo = "";
-let filterLivello = "";
+let athletes = [], coaches = [], valuations = [];
+let currentAthleteId = null;
+let ratings = {}, noteCategoria = "", noteFinale = "";
+let filterRuolo = "", filterLivello = "";
 
-function toggleFilters() {
-  const el = document.getElementById("filters-wrap");
-  el.style.display = el.style.display === "block" ? "none" : "block";
+const generalSkills = ["Bagher","Palleggio","Battuta","Atletismo generale","Attacco"];
+const roleSkills = {
+  "Banda":         ["Rincorsa","Variazione direzioni"],
+  "Opposto":       ["Rincorsa","Variazione direzioni"],
+  "Palleggiatore": ["Precisione alzata"],
+  "Centrale":      ["Variazione tempi","Muro"],
+  "Libero":        ["Appoggi","Bagher di difesa"]
+};
+
+async function airtableGet(table) {
+  const r = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}?pageSize=100`, { headers: H });
+  if (!r.ok) throw new Error(r.status);
+  return await r.json();
 }
 
-function toggleMore() {
-  document.getElementById("more-filters").classList.toggle("hidden");
+async function airtablePost(table, fields) {
+  const r = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}`, {
+    method: "POST", headers: H, body: JSON.stringify({ fields })
+  });
+  return await r.json();
+}
+
+async function loadData() {
+  document.getElementById("athletes-list").innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
+  try {
+    const [aR, cR, vR] = await Promise.all([airtableGet("Atleti"), airtableGet("Allenatori"), airtableGet("Valutazioni")]);
+    athletes = aR.records || [];
+    coaches  = cR.records || [];
+    valuations = vR.records || [];
+    applyFilters();
+  } catch(e) {
+    document.getElementById("athletes-list").innerHTML = '<div class="error-box">&#9888; Errore di connessione. Verifica la connessione internet.</div>';
+  }
+}
+
+function initials(n, s) { return ((n||"")[0]||"").toUpperCase() + ((s||"")[0]||"").toUpperCase(); }
+function getVals(id) { return valuations.filter(v => v.fields["Atleta"] && v.fields["Atleta"].includes(id)); }
+function calcAvg(vals, role) {
+  const skills = [...generalSkills, ...(roleSkills[role]||[])];
+  const all = [];
+  vals.forEach(v => skills.forEach(s => { if (v.fields[s]) all.push(v.fields[s]); }));
+  return all.length ? (all.reduce((a,b)=>a+b,0)/all.length).toFixed(1) : null;
 }
 
 function setPill(el) {
   const group = el.dataset.group;
-
-  document.querySelectorAll(`[data-group="${group}"]`)
-    .forEach(b => b.classList.remove("active"));
-
+  document.querySelectorAll(`.pill[data-group="${group}"]`).forEach(p => p.classList.remove("active"));
   el.classList.add("active");
-
   if (group === "ruolo") filterRuolo = el.dataset.val;
   if (group === "livello") filterLivello = el.dataset.val;
-
   applyFilters();
 }
 
 function applyFilters() {
-  // tua logica Airtable invariata
-  console.log("filtri:", filterRuolo, filterLivello);
+  const q = (document.getElementById("search-input").value || "").toLowerCase();
+  const filtered = athletes.filter(a => {
+    const f = a.fields;
+    const name = ((f["Name"]||"") + " " + (f["Cognome"]||"")).toLowerCase();
+    if (q && !name.includes(q)) return false;
+    if (filterRuolo && f["Ruolo"] !== filterRuolo) return false;
+    if (filterLivello && f["Livello"] !== filterLivello) return false;
+    return true;
+  });
+  renderList(filtered);
 }
 
-/* QUI SOTTO RIMANE TUTTO IL TUO JS ORIGINALE INTEGRO:
-   - loadData
-   - renderList
-   - showAthlete
-   - showForm
-   - submitForm
-   - ecc.
-*/
+function renderList(list) {
+  document.getElementById("list-meta").textContent = list.length + " atleti" + (list.length !== athletes.length ? " (filtrati su " + athletes.length + ")" : "");
+  const c = document.getElementById("athletes-list");
+  if (!list.length) { c.innerHTML = '<div class="empty-state">Nessun atleta trovato.</div>'; return; }
+  c.innerHTML = list.map(a => {
+    const f = a.fields;
+    const vals = getVals(a.id);
+    const avg = calcAvg(vals, f["Ruolo"]);
+    return `<div class="athlete-item" onclick="showAthlete('${a.id}')">
+      <div class="avatar"><div class="avatar-inner">${initials(f["Name"], f["Cognome"])}</div></div>
+      <div class="athlete-info">
+        <div class="athlete-name">${f["Name"]||""} ${f["Cognome"]||""}</div>
+        <div class="athlete-meta">
+          ${f["Ruolo"] ? `<span class="badge badge-role">${f["Ruolo"]}</span>` : ""}
+          ${f["Livello"] ? `<span class="badge badge-level">${f["Livello"]}</span>` : ""}
+          ${f["Tipologia"] ? `<span class="badge badge-tipo">${Array.isArray(f["Tipologia"]) ? f["Tipologia"].join(", ") : f["Tipologia"]}</span>` : ""}
+        </div>
+      </div>
+      <div class="athlete-right">
+        ${avg ? `<div class="avg-chip">&#9733; ${avg}</div>` : ""}
+        <div class="val-count">${vals.length} val.</div>
+      </div>
+      <span class="chevron">&#8250;</span>
+    </div>`;
+  }).join("");
+}
 
+function showAthlete(id) {
+  currentAthleteId = id;
+  const a = athletes.find(x => x.id === id);
+  if (!a) return;
+  const f = a.fields;
+  const vals = getVals(id);
+  const avg = calcAvg(vals, f["Ruolo"]);
+  const roleSpec = roleSkills[f["Ruolo"]] || [];
+
+  let photoHtml = `<div class="photo-box"><div class="photo-placeholder">&#128100;</div></div>`;
+  if (f["Foto"] && f["Foto"][0] && f["Foto"][0].url) {
+    photoHtml = `<div class="photo-box"><img src="${f["Foto"][0].url}" alt="${f["Name"]}"></div>`;
+  }
+
+  let mediaHtml = "";
+  if (avg) {
+    const nCoaches = coaches.filter(c => vals.some(v => v.fields["Allenatore"] && v.fields["Allenatore"].includes(c.id))).length;
+    mediaHtml = `<div class="media-box">
+      <div>
+        <div class="media-label">Media generale</div>
+        <div class="media-big"><span class="media-star">★</span>${avg} <span style="font-size:16px;opacity:0.45;">/ 5</span></div>
+      </div>
+      <div style="text-align:right;">
+        <div class="media-count">${vals.length} valutazion${vals.length===1?"e":"i"}</div>
+        <div class="media-label" style="margin-top:4px;">${nCoaches} allenator${nCoaches===1?"e":"i"}</div>
+      </div>
+    </div>`;
+  }
+
+  let valsHtml = vals.length ? `<div class="section-title">Valutazioni ricevute</div>` : `<div class="empty-state" style="padding:20px 0;">Nessuna valutazione ancora.</div>`;
+  vals.forEach(v => {
+    const coachId = v.fields["Allenatore"] && v.fields["Allenatore"][0];
+    const coach = coaches.find(c => c.id === coachId);
+    const coachName = coach ? coach.fields["Name"] : "—";
+    const allR = [...generalSkills, ...roleSpec].map(s => v.fields[s]).filter(Boolean);
+    const vAvg = allR.length ? (allR.reduce((a,b)=>a+b,0)/allR.length).toFixed(1) : "—";
+    valsHtml += `<div class="val-card">
+      <div class="val-card-header">
+        <div class="val-coach-name">${coachName}</div>
+        <div class="val-avg-badge">★ ${vAvg}</div>
+      </div>
+      <div class="val-skills">
+        ${[...generalSkills,...roleSpec].map(s => {
+          if (!v.fields[s]) return "";
+          const n = v.fields[s];
+          return `<div class="skill-result"><span class="skill-result-name">${s}</span><span><span class="stars-on">${"★".repeat(n)}</span><span class="stars-off">${"★".repeat(5-n)}</span></span></div>`;
+        }).join("")}
+      </div>
+      ${v.fields["Nota Finale"] ? `<div class="val-note">"${v.fields["Nota Finale"]}"</div>` : ""}
+    </div>`;
+  });
+
+  document.getElementById("athlete-detail").innerHTML = `
+    <div class="athlete-hero">
+      <div class="hero-stripe"></div>
+      <div class="hero-body">
+        <div class="hero-top">
+          ${photoHtml}
+          <div style="flex:1;">
+            <div class="hero-name">${f["Name"]||""} ${f["Cognome"]||""}</div>
+            <div class="hero-badges">
+              ${f["Ruolo"] ? `<span class="badge badge-role">${f["Ruolo"]}</span>` : ""}
+              ${f["Livello"] ? `<span class="badge badge-level">${f["Livello"]}</span>` : ""}
+              ${f["Tipologia"] ? `<span class="badge badge-tipo">${Array.isArray(f["Tipologia"]) ? f["Tipologia"].join(", ") : f["Tipologia"]}</span>` : ""}
+            </div>
+          </div>
+        </div>
+        <div class="info-grid">
+          ${f["Anno di Nascita"] ? `<div class="info-item"><div class="lbl">Nato</div><div class="val">${f["Anno di Nascita"]}</div></div>` : ""}
+          ${f["Altezza"] ? `<div class="info-item"><div class="lbl">Altezza</div><div class="val">${f["Altezza"]} cm</div></div>` : ""}
+          ${f["Esperienza precedente"] ? `<div class="info-item"><div class="lbl">Club</div><div class="val">${f["Esperienza precedente"]}</div></div>` : ""}
+          ${f["Mano dominante"] ? `<div class="info-item"><div class="lbl">Mano</div><div class="val">${f["Mano dominante"]}</div></div>` : ""}
+        </div>
+      </div>
+    </div>
+    ${mediaHtml}
+    <button class="add-val-btn" onclick="showForm('${id}')">+ Aggiungi valutazione</button>
+    ${valsHtml}
+  `;
+  setScreen("screen-athlete", true);
+}
+
+function showForm(athleteId) {
+  currentAthleteId = athleteId;
+  ratings = {}; noteCategoria = ""; noteFinale = "";
+  const a = athletes.find(x => x.id === athleteId);
+  const f = a ? a.fields : {};
+  const roleSpec = roleSkills[f["Ruolo"]] || [];
+  const coachOptions = coaches.map(c => `<option value="${c.id}">${c.fields["Name"]}</option>`).join("");
+
+  let skillsHtml = `<div class="skill-section-title">Skill generali</div>`;
+  generalSkills.forEach(s => { skillsHtml += makeSkill(s); });
+  if (roleSpec.length) {
+    skillsHtml += `<div class="skill-section-title">Skill specifiche <span class="role-tag">${f["Ruolo"]}</span></div>`;
+    roleSpec.forEach(s => { skillsHtml += makeSkill(s); });
+  }
+
+  document.getElementById("form-content").innerHTML = `
+    <div class="form-header">
+      <div class="form-athlete-name">${f["Name"]||""} ${f["Cognome"]||""}</div>
+      <div class="hero-badges">
+        ${f["Ruolo"] ? `<span class="badge badge-role">${f["Ruolo"]}</span>` : ""}
+        ${f["Livello"] ? `<span class="badge badge-level">${f["Livello"]}</span>` : ""}
+      </div>
+    </div>
+    <div class="section-title">Allenatore</div>
+    <select class="form-select" id="coach-select" style="margin-bottom:4px;">
+      <option value="">— seleziona allenatore —</option>
+      ${coachOptions}
+    </select>
+    ${skillsHtml}
+    <div class="section-title" style="margin-top:16px;">Note per categoria</div>
+    <input class="note-input" type="text" id="note-cat" placeholder="Note sulle skill valutate..." oninput="noteCategoria=this.value" style="margin-bottom:4px;">
+    <div class="section-title" style="margin-top:12px;">Nota finale</div>
+    <textarea class="note-input" id="note-fin" placeholder="Impressioni generali, potenziale, aspetti da sviluppare..." oninput="noteFinale=this.value"></textarea>
+    <button class="save-btn" onclick="submitForm()" id="save-btn">Salva valutazione</button>
+    <div class="form-msg" id="form-msg"></div>
+  `;
+  setScreen("screen-form", true);
+}
+
+function makeSkill(name) {
+  const sid = "s_" + name.replace(/[^a-zA-Z0-9]/g,"_");
+  return `<div class="skill-block" id="block_${sid}">
+    <span class="skill-name">${name}</span>
+    <div class="stars" id="${sid}">
+      ${[1,2,3,4,5].map(i=>`<span class="star" onclick="setRating('${name}',${i},'${sid}')">★</span>`).join("")}
+    </div>
+  </div>`;
+}
+
+function setRating(skill, val, sid) {
+  ratings[skill] = val;
+  document.getElementById(sid).querySelectorAll(".star").forEach((s,i) => s.classList.toggle("on", i < val));
+  const b = document.getElementById("block_" + sid);
+  if (b) b.classList.add("rated");
+}
+
+async function submitForm() {
+  const coachId = document.getElementById("coach-select").value;
+  const msg = document.getElementById("form-msg");
+  const btn = document.getElementById("save-btn");
+  if (!coachId) { msg.style.color = "var(--danger)"; msg.textContent = "⚠ Seleziona un allenatore."; return; }
+  if (!Object.keys(ratings).length) { msg.style.color = "var(--danger)"; msg.textContent = "⚠ Inserisci almeno una valutazione."; return; }
+  btn.disabled = true; btn.textContent = "Salvataggio..."; msg.textContent = "";
+  const fields = { "Atleta": [currentAthleteId], "Allenatore": [coachId], "Nota Categoria": noteCategoria, "Nota Finale": noteFinale, ...ratings };
+  try {
+    const res = await airtablePost("Valutazioni", fields);
+    if (res.id) {
+      valuations.push(res);
+      msg.style.color = "var(--success)"; msg.textContent = "✓ Valutazione salvata!"; btn.textContent = "✓ Salvato";
+      setTimeout(() => showAthlete(currentAthleteId), 1000);
+    } else {
+      btn.disabled = false; btn.textContent = "Salva valutazione";
+      msg.style.color = "var(--danger)"; msg.textContent = "Errore: " + ((res.error && res.error.message) || "riprova.");
+    }
+  } catch(e) {
+    btn.disabled = false; btn.textContent = "Salva valutazione";
+    msg.style.color = "var(--danger)"; msg.textContent = "Errore di rete.";
+  }
+}
+
+function setScreen(id, showBack) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.getElementById("back-btn").classList.toggle("visible", !!showBack);
+}
+
+function goBack() {
+  if (document.getElementById("screen-form").classList.contains("active")) showAthlete(currentAthleteId);
+  else { setScreen("screen-list", false); applyFilters(); }
+}
+
+loadData();
 </script>
-
 </body>
 </html>
