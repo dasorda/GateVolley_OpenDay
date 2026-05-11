@@ -253,14 +253,36 @@ async function airtablePost(table, fields) {
   });
   return await r.json();
 }
+  
+async function airtableGetAll(table) {
+  let records = [];
+  let offset;
 
+  do {
+    const url = new URL(
+      `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}`
+    );
+    url.searchParams.set("pageSize", "100");
+    if (offset) url.searchParams.set("offset", offset);
+
+    const r = await fetch(url.toString(), { headers: H });
+    if (!r.ok) throw new Error(r.status);
+
+    const json = await r.json();
+    records.push(...json.records);
+    offset = json.offset;
+  } while (offset);
+
+  return records;
+}
+  
 async function loadData() {
   document.getElementById("athletes-list").innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
   try {
-    const [aR, cR, vR] = await Promise.all([airtableGet("Atleti"), airtableGet("Allenatori"), airtableGet("Valutazioni")]);
-    athletes = aR.records || [];
-    coaches  = cR.records || [];
-    valuations = vR.records || [];
+    const [aR, cR, vR] = await Promise.all([airtableGetAll("Atleti"), airtableGetAll("Allenatori"), airtableGetAll("Valutazioni")]);
+    athletes = aR;
+    coaches  = cR;
+    valuations = vR;
     applyFilters();
   } catch(e) {
     document.getElementById("athletes-list").innerHTML = '<div class="error-box">&#9888; Errore di connessione. Verifica la connessione internet.</div>';
