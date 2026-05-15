@@ -223,9 +223,7 @@ textarea.note-input { resize: vertical; min-height: 80px; }
 </div>
 
 <script>
-const BASE_ID = "appxf7pgODaVZNvqI";
-const TOKEN = "pat2yDSGOEsMhxWSz.377c288614640e6e59d90d2fa394545d1082e00fd024c84aeab3336d2255784b";
-const H = { "Authorization": "Bearer " + TOKEN, "Content-Type": "application/json" };
+const PROXY = "https://airtable-proxy.dasorda.workers.dev/proxy";
 
 let athletes = [], coaches = [], valuations = [];
 let currentAthleteId = null;
@@ -248,8 +246,10 @@ async function airtableGet(table) {
 }
 
 async function airtablePost(table, fields) {
-  const r = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}`, {
-    method: "POST", headers: H, body: JSON.stringify({ fields })
+  const r = await fetch(`${PROXY}/${encodeURIComponent(table)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fields })
   });
   return await r.json();
 }
@@ -257,22 +257,16 @@ async function airtablePost(table, fields) {
 async function airtableGetAll(table) {
   let records = [];
   let offset;
-
   do {
-    const url = new URL(
-      `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(table)}`
-    );
+    const url = new URL(`${PROXY}/${encodeURIComponent(table)}`);
     url.searchParams.set("pageSize", "100");
     if (offset) url.searchParams.set("offset", offset);
-
-    const r = await fetch(url.toString(), { headers: H });
+    const r = await fetch(url.toString());
     if (!r.ok) throw new Error(r.status);
-
     const json = await r.json();
     records.push(...json.records);
     offset = json.offset;
   } while (offset);
-
   return records;
 }
   
