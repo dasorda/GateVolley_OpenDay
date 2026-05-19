@@ -165,6 +165,9 @@ textarea.note-input { resize: vertical; min-height: 80px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .empty-state { text-align: center; padding: 32px 0; color: var(--text3); font-size: 14px; }
 .error-box { background: var(--danger-bg); color: var(--danger); border-radius: var(--r); padding: 12px 16px; font-size: 13px; font-weight: 500; margin-bottom: 12px; }
+.warn-box { background: #FFF7E6; color: #92400E; border: 1px solid #FDE68A; border-radius: var(--r); padding: 10px 14px; font-size: 13px; font-weight: 500; margin-bottom: 10px; }
+.export-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 9px 16px; border-radius: var(--r); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; box-shadow: var(--shadow); margin-bottom: 14px; }
+.export-btn:hover { border-color: #00B894; color: #00B894; background: #F0FDF8; }
 
 @media (max-width: 480px) {
   .container { padding: 14px 12px 32px; }
@@ -210,7 +213,10 @@ textarea.note-input { resize: vertical; min-height: 80px; }
       </div>
       <div class="filter-group" id="date-filter-group" style="display:none;"></div>
     </div>
-    <div class="list-meta" id="list-meta"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div class="list-meta" id="list-meta"></div>
+      <button class="export-btn" onclick="exportCSV()">⬇ Esporta Excel (.csv)</button>
+    </div>
     <div class="athletes-list" id="athletes-list">
       <div class="loading"><div class="spinner"></div>Caricamento atleti...</div>
     </div>
@@ -495,8 +501,21 @@ function showForm(athleteId, valuationId = null) {
   const a = athletes.find(x => x.id === athleteId);
   const f = a ? a.fields : {};
   const roleSpec = roleSkills[f["Ruolo"]] || [];
+
+  // Coaches who already evaluated this athlete (exclude the one being edited)
+  const athleteVals = valuations.filter(v => v.fields["Atleta"] && v.fields["Atleta"].includes(athleteId));
+  const coachesAlreadyEvaluated = new Set(
+    athleteVals
+      .filter(v => v.id !== valuationId)
+      .map(v => v.fields["Allenatore"] && v.fields["Allenatore"][0])
+      .filter(Boolean)
+  );
+
   const existingCoachId = existingVal && existingVal.fields["Allenatore"] && existingVal.fields["Allenatore"][0];
-  const coachOptions = coaches.map(c => `<option value="${c.id}" ${c.id === existingCoachId ? "selected" : ""}>${c.fields["Name"]}</option>`).join("");
+  const coachOptions = coaches.map(c => {
+    const alreadyDone = coachesAlreadyEvaluated.has(c.id);
+    return `<option value="${c.id}" ${c.id === existingCoachId ? "selected" : ""} ${alreadyDone ? "disabled" : ""}>${c.fields["Name"]}${alreadyDone ? " (già valutato)" : ""}</option>`;
+  }).join("");
 
   let skillsHtml = `<div class="skill-section-title">Skill generali</div>`;
   generalSkills.forEach(s => { skillsHtml += makeSkill(s, ratings[s] || 0); });
@@ -556,6 +575,20 @@ async function submitForm() {
 
   if (!isEditing && !coachId) { msg.style.color = "var(--danger)"; msg.textContent = "⚠ Seleziona un allenatore."; return; }
   if (!Object.keys(ratings).length) { msg.style.color = "var(--danger)"; msg.textContent = "⚠ Inserisci almeno una valutazione."; return; }
+
+  // Duplicate check: same coach cannot evaluate same athlete twice
+  if (!isEditing && coachId) {
+    const duplicate = valuations.find(v =>
+      v.fields["Atleta"] && v.fields["Atleta"].includes(currentAthleteId) &&
+      v.fields["Allenatore"] && v.fields["Allenatore"].includes(coachId)
+    );
+    if (duplicate) {
+      const coach = coaches.find(c => c.id === coachId);
+      msg.style.color = "var(--danger)";
+      msg.textContent = `⚠ ${coach ? coach.fields["Name"] : "Questo allenatore"} ha già valutato questo atleta.`;
+      return;
+    }
+  }
   btn.disabled = true; btn.textContent = "Salvataggio..."; msg.textContent = "";
 
   try {
@@ -598,6 +631,55 @@ function setScreen(id, showBack) {
 function goBack() {
   if (document.getElementById("screen-form").classList.contains("active")) showAthlete(currentAthleteId);
   else { setScreen("screen-list", false); applyFilters(); }
+}
+
+function exportCSV() {
+  const allSkills = [...generalSkills, ...Object.values(roleSkills).flat()];
+  const uniqueSkills = [...new Set(allSkills)];
+
+  const header = [
+    "Atleta", "Ruolo", "Livello", "Anno di Nascita", "Altezza",
+    "Allenatore", "Media", ...uniqueSkills, "Nota Categoria", "Nota Finale"
+  ];
+
+  const rows = valuations.map(v => {
+    const athleteId = v.fields["Atleta"] && v.fields["Atleta"][0];
+    const athlete = athletes.find(a => a.id === athleteId);
+    const af = athlete ? athlete.fields : {};
+    const coachId = v.fields["Allenatore"] && v.fields["Allenatore"][0];
+    const coach = coaches.find(c => c.id === coachId);
+    const role = af["Ruolo"] || "";
+    const skillsForRole = [...generalSkills, ...(roleSkills[role] || [])];
+    const vals = skillsForRole.map(s => v.fields[s]).filter(Boolean);
+    const avg = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : "";
+
+    return [
+      `${af["Name"]||""} ${af["Cognome"]||""}`.trim(),
+      role,
+      af["Livello"] || "",
+      af["Anno di Nascita"] || "",
+      af["Altezza"] || "",
+      coach ? coach.fields["Name"] : "",
+      avg,
+      ...uniqueSkills.map(s => v.fields[s] != null ? v.fields[s] : ""),
+      v.fields["Nota Categoria"] || "",
+      v.fields["Nota Finale"] || ""
+    ];
+  });
+
+  const escape = val => {
+    const s = String(val);
+    return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g,'""')}"` : s;
+  };
+
+  const csv = [header, ...rows].map(r => r.map(escape).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `valutazioni_gate_volley_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 loadData();
