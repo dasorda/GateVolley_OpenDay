@@ -129,6 +129,8 @@ header { background: var(--bg); padding: 12px 16px 0; }
 .val-note { padding: 10px 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text2); font-style: italic; background: var(--surface2); }
 .edit-val-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--text2); font-size: 12px; font-weight: 500; padding: 3px 10px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
 .edit-val-btn:hover { border-color: #7b2ff7; color: #7b2ff7; background: #F5F0FF; }
+.delete-val-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--text2); font-size: 14px; padding: 3px 8px; cursor: pointer; transition: all 0.15s; line-height: 1; }
+.delete-val-btn:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
 .skill-result-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); padding: 6px 0 2px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
 
 .val-skills-preview { padding: 10px 14px 10px; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid var(--border); background: var(--surface2); }
@@ -477,7 +479,8 @@ function showAthlete(id) {
         <div class="val-coach-name">${coachName}</div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="val-avg-badge">&#9733; ${vAvg}</div>
-          <button class="edit-val-btn" onclick="showForm('${id}', '${v.id}')">&#9999;&#65039; Modifica</button>
+          <button class="edit-val-btn" onclick="showForm('${id}', '${v.id}')" title="Modifica">&#9999;&#65039; Modifica</button>
+          <button class="delete-val-btn" onclick="deleteValuation('${v.id}', '${id}')" title="Elimina">&#128465;</button>
         </div>
       </div>
       <div class="val-skills-pills val-skills-preview">${generalPills}</div>
@@ -662,6 +665,28 @@ function setScreen(id, showBack) {
 function goBack() {
   if (document.getElementById("screen-form").classList.contains("active")) showAthlete(currentAthleteId);
   else { setScreen("screen-list", false); applyFilters(); }
+}
+
+async function deleteValuation(valuationId, athleteId) {
+  const coach = coaches.find(c => {
+    const v = valuations.find(v => v.id === valuationId);
+    return v && v.fields["Allenatore"] && v.fields["Allenatore"].includes(c.id);
+  });
+  const coachName = coach ? coach.fields["Name"] : "questo allenatore";
+  const confirmed = confirm(`Eliminare la valutazione di ${coachName}?\nL'operazione non è reversibile.`);
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`${PROXY}/Valutazioni/${valuationId}`, { method: "DELETE" });
+    if (res.ok) {
+      valuations = valuations.filter(v => v.id !== valuationId);
+      showAthlete(athleteId);
+    } else {
+      alert("Errore durante l'eliminazione. Riprova.");
+    }
+  } catch(e) {
+    alert("Errore di rete. Riprova.");
+  }
 }
 
 function toggleSkillsExtra(id) {
