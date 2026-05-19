@@ -134,7 +134,9 @@ header { background: var(--bg); padding: 12px 16px 0; }
 .val-skills-preview { padding: 10px 14px 10px; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid var(--border); background: var(--surface2); }
 .val-skills-more-btn { width: 100%; padding: 8px 16px; background: none; border: none; border-top: 1px solid var(--border); font-family: inherit; font-size: 12px; font-weight: 600; color: #7b2ff7; cursor: pointer; text-align: left; transition: background 0.15s; }
 .val-skills-more-btn:hover { background: #F5F0FF; }
-.val-skills-extra { padding: 0 14px 10px; display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface2); }
+.val-skills-extra { background: var(--surface2); border-top: 1px solid var(--border); }
+.val-skills-role-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); padding: 8px 14px 4px; }
+.val-skills-extra-pills { padding: 4px 14px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
 .val-skills-toggle { display: flex; align-items: center; justify-content: space-between; padding: 9px 16px; cursor: pointer; border-top: 1px solid var(--border); transition: background 0.15s; user-select: none; }
 .val-skills-toggle:hover { background: var(--surface2); }
 .val-skills-toggle-label { font-size: 12px; font-weight: 600; color: var(--text2); }
@@ -448,24 +450,25 @@ function showAthlete(id) {
     const vAvg = allR.length ? (allR.reduce((a,b)=>a+b,0)/allR.length).toFixed(1) : "—";
     const skillsId = `skills-${v.id}`;
 
-    const PREVIEW_COUNT = 4;
     const renderSkillPill = s => {
       if (!v.fields[s]) return "";
       const n = v.fields[s];
       return `<div class="skill-pill"><span class="skill-pill-name">${s}</span><span class="skill-pill-stars">${"★".repeat(n)}<span class="skill-pill-off">${"★".repeat(5-n)}</span></span></div>`;
     };
 
-    const ratedSkills = [...generalSkills, ...roleSpec].filter(s => v.fields[s]);
-    const previewPills = ratedSkills.slice(0, PREVIEW_COUNT).map(renderSkillPill).join("");
-    const extraPills = ratedSkills.slice(PREVIEW_COUNT).map(renderSkillPill).join("");
-    const extraCount = ratedSkills.length - PREVIEW_COUNT;
-    const extraBlock = extraCount > 0
-      ? `<div class="val-skills-pills val-skills-extra" id="${skillsId}" style="display:none;">${extraPills}</div>
-         <button class="val-skills-more-btn" id="${skillsId}-btn" onclick="toggleSkillsExtra('${skillsId}')">+ ${extraCount} altre skill</button>`
+    // Generali sempre visibili, skill di ruolo espandibili
+    const generalPills = generalSkills.map(renderSkillPill).join("");
+    const rolePills = roleSpec.filter(s => v.fields[s]).map(renderSkillPill).join("");
+    const roleLabel = f["Ruolo"] || "ruolo";
+    const roleCount = roleSpec.filter(s => v.fields[s]).length;
+    const extraBlock = rolePills
+      ? `<button class="val-skills-more-btn" id="${skillsId}-btn" onclick="toggleSkillsExtra('${skillsId}')">+ skill ${roleLabel} (${roleCount})</button>
+         <div class="val-skills-extra" id="${skillsId}" style="display:none;">
+           <div class="val-skills-role-label">Skill ${roleLabel}</div>
+           <div class="val-skills-pills val-skills-extra-pills">${rolePills}</div>
+         </div>`
       : "";
 
-    const notaCat = v.fields["Nota Categoria"]
-      ? `<div class="val-nota-cat"><span class="val-nota-cat-icon">&#128203;</span>${v.fields["Nota Categoria"]}</div>` : "";
     const notaFin = v.fields["Nota Finale"]
       ? `<div class="val-nota-fin"><span class="val-nota-quote">&#8220;</span><span class="val-nota-text">${v.fields["Nota Finale"]}</span></div>` : "";
 
@@ -477,9 +480,9 @@ function showAthlete(id) {
           <button class="edit-val-btn" onclick="showForm('${id}', '${v.id}')">&#9999;&#65039; Modifica</button>
         </div>
       </div>
-      <div class="val-skills-pills val-skills-preview">${previewPills}</div>
+      <div class="val-skills-pills val-skills-preview">${generalPills}</div>
       ${extraBlock}
-      ${notaCat}${notaFin}
+      ${notaFin}
     </div>`;
   });
 
@@ -665,9 +668,10 @@ function toggleSkillsExtra(id) {
   const panel = document.getElementById(id);
   const btn = document.getElementById(id + "-btn");
   const isOpen = panel.style.display !== "none";
-  panel.style.display = isOpen ? "none" : "flex";
-  const extraCount = panel.querySelectorAll(".skill-pill").length;
-  btn.textContent = isOpen ? `+ ${extraCount} altre skill` : "▴ Nascondi";
+  panel.style.display = isOpen ? "none" : "block";
+  const roleLabel = btn.dataset.role || "";
+  const roleCount = panel.querySelectorAll(".skill-pill").length;
+  btn.textContent = isOpen ? `+ skill ${roleLabel} (${roleCount})` : "▴ Nascondi skill " + roleLabel;
 }
 
 function exportCSV() {
