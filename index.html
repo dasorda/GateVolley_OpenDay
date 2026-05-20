@@ -347,10 +347,10 @@ function buildDatePills() {
   container.style.display = "flex";
 
   const pills = dates.map(d =>
-    `<button class="pill" data-group="data" data-val="${d}" onclick="setPill(this)">${formatDate(d)}</button>`
+    `<button class="pill" data-group="data" data-val="${d}" onclick="togglePillDate(this)">${formatDate(d)}</button>`
   ).join("");
   container.innerHTML = `<span class="filter-label">Data</span>
-    <button class="pill active" data-group="data" data-val="" onclick="setPill(this)">Tutte</button>
+    <button class="pill active" id="date-all-btn" data-group="data" data-val="" onclick="clearDateFilter(this)">Tutte</button>
     ${pills}`;
 }
 
