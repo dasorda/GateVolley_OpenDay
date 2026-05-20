@@ -263,7 +263,7 @@ const PROXY = "https://airtable-proxy.dasorda.workers.dev/proxy";
 let athletes = [], coaches = [], valuations = [];
 let currentAthleteId = null;
 let ratings = {}, noteCategoria = "", noteFinale = "";
-let filterRuolo = "", filterLivello = "", filterData = "";
+let filterRuolo = "", filterLivello = "", filterData = new Set();
 let editingValuationId = null;
 
 function formatDate(isoDate) {
@@ -369,7 +369,27 @@ function setPill(el) {
   el.classList.add("active");
   if (group === "ruolo") filterRuolo = el.dataset.val;
   if (group === "livello") filterLivello = el.dataset.val;
-  if (group === "data") filterData = el.dataset.val;
+  applyFilters();
+}
+
+function togglePillDate(el) {
+  const val = el.dataset.val;
+  if (filterData.has(val)) {
+    filterData.delete(val);
+    el.classList.remove("active");
+  } else {
+    filterData.add(val);
+    el.classList.add("active");
+  }
+  const allBtn = document.getElementById("date-all-btn");
+  if (allBtn) allBtn.classList.toggle("active", filterData.size === 0);
+  applyFilters();
+}
+
+function clearDateFilter(el) {
+  filterData.clear();
+  document.querySelectorAll('.pill[data-group="data"]').forEach(p => p.classList.remove("active"));
+  el.classList.add("active");
   applyFilters();
 }
 
@@ -381,7 +401,7 @@ function applyFilters() {
     if (q && !name.includes(q)) return false;
     if (filterRuolo && f["Ruolo"] !== filterRuolo) return false;
     if (filterLivello && f["Livello"] !== filterLivello) return false;
-    if (filterData && f["Data OpenDay"] !== filterData) return false;
+    if (filterData.size && !filterData.has(f["Data OpenDay"])) return false;
     return true;
   });
   renderList(filtered);
@@ -479,7 +499,7 @@ function showAthlete(id) {
         <div class="val-coach-name">${coachName}</div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="val-avg-badge">&#9733; ${vAvg}</div>
-          <button class="edit-val-btn" onclick="showForm('${id}', '${v.id}')" title="Modifica">&#9999;&#65039;</button>
+          <button class="edit-val-btn" onclick="showForm('${id}', '${v.id}')" title="Modifica">&#9999;&#65039; Modifica</button>
           <button class="delete-val-btn" onclick="deleteValuation('${v.id}', '${id}')" title="Elimina">&#128465;</button>
         </div>
       </div>
