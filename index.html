@@ -262,11 +262,9 @@ const PROXY = "https://airtable-proxy.dasorda.workers.dev/proxy";
 
 let athletes = [], coaches = [], valuations = [];
 let currentAthleteId = null;
-let ratings = {}, noteCategoria = "", noteFinale = "", ruoloValutato = "";
+let ratings = {}, noteCategoria = "", noteFinale = "";
 let filterRuolo = "", filterLivello = "", filterData = new Set();
 let editingValuationId = null;
-
-const ruoliDisponibili = ["Banda","Opposto","Palleggiatore","Centrale","Libero","Universale"];
 
 function formatDate(isoDate) {
   if (!isoDate) return "";
@@ -359,12 +357,9 @@ function buildDatePills() {
 function initials(n, s) { return ((n||"")[0]||"").toUpperCase() + ((s||"")[0]||"").toUpperCase(); }
 function getVals(id) { return valuations.filter(v => v.fields["Atleta"] && v.fields["Atleta"].includes(id)); }
 function calcAvg(vals, role) {
+  const skills = [...generalSkills, ...(roleSkills[role]||[])];
   const all = [];
-  vals.forEach(v => {
-    const r = v.fields["Ruolo Valutato"] || role;
-    const skills = [...generalSkills, ...(roleSkills[r]||[])];
-    skills.forEach(s => { if (v.fields[s]) all.push(v.fields[s]); });
-  });
+  vals.forEach(v => skills.forEach(s => { if (v.fields[s]) all.push(v.fields[s]); }));
   return all.length ? (all.reduce((a,b)=>a+b,0)/all.length).toFixed(1) : null;
 }
 
@@ -473,15 +468,9 @@ function showAthlete(id) {
     const coachId = v.fields["Allenatore"] && v.fields["Allenatore"][0];
     const coach = coaches.find(c => c.id === coachId);
     const coachName = coach ? coach.fields["Name"] : "—";
-    // Usa il ruolo valutato (se presente), altrimenti il ruolo anagrafico
-    const ruoloEffettivo = v.fields["Ruolo Valutato"] || f["Ruolo"] || "";
-    const roleSpecV = roleSkills[ruoloEffettivo] || [];
-    const allR = [...generalSkills, ...roleSpecV].map(s => v.fields[s]).filter(Boolean);
+    const allR = [...generalSkills, ...roleSpec].map(s => v.fields[s]).filter(Boolean);
     const vAvg = allR.length ? (allR.reduce((a,b)=>a+b,0)/allR.length).toFixed(1) : "—";
     const skillsId = `skills-${v.id}`;
-    const ruoloBadge = ruoloEffettivo && ruoloEffettivo !== f["Ruolo"]
-      ? `<span class="badge" style="background:#FEF7EA;color:#92400E;margin-left:4px;">👟 ${ruoloEffettivo}</span>`
-      : (ruoloEffettivo ? `<span class="badge badge-role" style="font-size:10px;">${ruoloEffettivo}</span>` : "");
 
     const renderSkillPill = s => {
       if (!v.fields[s]) return "";
@@ -491,9 +480,9 @@ function showAthlete(id) {
 
     // Generali sempre visibili, skill di ruolo espandibili
     const generalPills = generalSkills.map(renderSkillPill).join("");
-    const rolePills = roleSpecV.filter(s => v.fields[s]).map(renderSkillPill).join("");
-    const roleLabel = ruoloEffettivo || "ruolo";
-    const roleCount = roleSpecV.filter(s => v.fields[s]).length;
+    const rolePills = roleSpec.filter(s => v.fields[s]).map(renderSkillPill).join("");
+    const roleLabel = f["Ruolo"] || "ruolo";
+    const roleCount = roleSpec.filter(s => v.fields[s]).length;
     const extraBlock = rolePills
       ? `<button class="val-skills-more-btn" id="${skillsId}-btn" onclick="toggleSkillsExtra('${skillsId}')">+ skill ${roleLabel} (${roleCount})</button>
          <div class="val-skills-extra" id="${skillsId}" style="display:none;">
@@ -507,10 +496,7 @@ function showAthlete(id) {
 
     valsHtml += `<div class="val-card">
       <div class="val-card-header">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <div class="val-coach-name">${coachName}</div>
-          ${ruoloBadge}
-        </div>
+        <div class="val-coach-name">${coachName}</div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="val-avg-badge">&#9733; ${vAvg}</div>
           <button class="edit-val-btn" onclick="showForm('${id}', '${v.id}')" title="Modifica">&#9999;&#65039; Modifica</button>
@@ -564,13 +550,11 @@ function showForm(athleteId, valuationId = null) {
     allSkills.forEach(s => { if (existingVal.fields[s]) ratings[s] = existingVal.fields[s]; });
     noteCategoria = existingVal.fields["Nota Categoria"] || "";
     noteFinale    = existingVal.fields["Nota Finale"]    || "";
-    ruoloValutato = existingVal.fields["Ruolo Valutato"] || "";
   }
 
   const a = athletes.find(x => x.id === athleteId);
   const f = a ? a.fields : {};
-  if (!ruoloValutato) ruoloValutato = f["Ruolo"] || "";
-  const roleSpec = roleSkills[ruoloValutato] || [];
+  const roleSpec = roleSkills[f["Ruolo"]] || [];
 
   // Coaches who already evaluated this athlete (exclude the one being edited)
   const athleteVals = valuations.filter(v => v.fields["Atleta"] && v.fields["Atleta"].includes(athleteId));
@@ -590,20 +574,16 @@ function showForm(athleteId, valuationId = null) {
   let skillsHtml = `<div class="skill-section-title">Skill generali</div>`;
   generalSkills.forEach(s => { skillsHtml += makeSkill(s, ratings[s] || 0); });
   if (roleSpec.length) {
-    skillsHtml += `<div class="skill-section-title">Skill specifiche <span class="role-tag">${ruoloValutato}</span></div>`;
+    skillsHtml += `<div class="skill-section-title">Skill specifiche <span class="role-tag">${f["Ruolo"]}</span></div>`;
     roleSpec.forEach(s => { skillsHtml += makeSkill(s, ratings[s] || 0); });
   }
-
-  const ruoloOptions = ruoliDisponibili.map(r =>
-    `<option value="${r}" ${r === ruoloValutato ? "selected" : ""}>${r}${r === f["Ruolo"] ? " (originale)" : ""}</option>`
-  ).join("");
 
   const isEditing = !!valuationId;
   document.getElementById("form-content").innerHTML = `
     <div class="form-header">
       <div class="form-athlete-name">${f["Name"]||""} ${f["Cognome"]||""}</div>
       <div class="hero-badges">
-        ${f["Ruolo"] ? `<span class="badge badge-role">Anagrafica: ${f["Ruolo"]}</span>` : ""}
+        ${f["Ruolo"] ? `<span class="badge badge-role">${f["Ruolo"]}</span>` : ""}
         ${f["Livello"] ? `<span class="badge badge-level">${f["Livello"]}</span>` : ""}
         ${isEditing ? `<span class="badge" style="background:#E0F2FE;color:#0369A1;">Modifica valutazione</span>` : ""}
       </div>
@@ -613,14 +593,7 @@ function showForm(athleteId, valuationId = null) {
       <option value="">— seleziona allenatore —</option>
       ${coachOptions}
     </select>
-    <div class="section-title" style="margin-top:14px;">Ruolo valutato</div>
-    <select class="form-select" id="ruolo-select" style="margin-bottom:4px;" onchange="changeRuoloValutato(this.value, '${athleteId}', '${valuationId||''}')">
-      ${ruoloOptions}
-    </select>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Cambia il ruolo se l'atleta è stato valutato in una posizione diversa da quella di registrazione.</div>
-    <div id="skills-section">
-      ${skillsHtml}
-    </div>
+    ${skillsHtml}
     <div class="section-title" style="margin-top:16px;">Note per categoria</div>
     <input class="note-input" type="text" id="note-cat" placeholder="Note sulle skill valutate..." value="${noteCategoria}" oninput="noteCategoria=this.value" style="margin-bottom:4px;">
     <div class="section-title" style="margin-top:12px;">Nota finale</div>
@@ -630,18 +603,6 @@ function showForm(athleteId, valuationId = null) {
   `;
   setScreen("screen-form", true);
 }
-
-function changeRuoloValutato(nuovoRuolo, athleteId, valuationId) {
-  ruoloValutato = nuovoRuolo;
-  // Rebuild only the skills section
-  const roleSpec = roleSkills[ruoloValutato] || [];
-  let skillsHtml = `<div class="skill-section-title">Skill generali</div>`;
-  generalSkills.forEach(s => { skillsHtml += makeSkill(s, ratings[s] || 0); });
-  if (roleSpec.length) {
-    skillsHtml += `<div class="skill-section-title">Skill specifiche <span class="role-tag">${ruoloValutato}</span></div>`;
-    roleSpec.forEach(s => { skillsHtml += makeSkill(s, ratings[s] || 0); });
-  }
-  document.getElementById("skills-section").innerHTML = skillsHtml;
 
 function makeSkill(name, initialValue = 0) {
   const sid = "s_" + name.replace(/[^a-zA-Z0-9]/g,"_");
@@ -687,14 +648,14 @@ async function submitForm() {
   try {
     let res;
     if (isEditing) {
-      const fields = { "Nota Categoria": noteCategoria, "Nota Finale": noteFinale, "Ruolo Valutato": ruoloValutato, ...ratings };
+      const fields = { "Nota Categoria": noteCategoria, "Nota Finale": noteFinale, ...ratings };
       res = await airtablePatch("Valutazioni", editingValuationId, fields);
       if (res.id) {
         const idx = valuations.findIndex(v => v.id === res.id);
         if (idx !== -1) valuations[idx] = res;
       }
     } else {
-      const fields = { "Atleta": [currentAthleteId], "Allenatore": [coachId], "Nota Categoria": noteCategoria, "Nota Finale": noteFinale, "Ruolo Valutato": ruoloValutato, ...ratings };
+      const fields = { "Atleta": [currentAthleteId], "Allenatore": [coachId], "Nota Categoria": noteCategoria, "Nota Finale": noteFinale, ...ratings };
       res = await airtablePost("Valutazioni", fields);
       if (res.id) valuations.push(res);
     }
