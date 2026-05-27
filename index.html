@@ -262,7 +262,8 @@ const PROXY = "https://airtable-proxy.dasorda.workers.dev/proxy";
 
 let athletes = [], coaches = [], valuations = [];
 let currentAthleteId = null;
-let ratings = {}, noteCategoria = "", noteFinale = "", ruoloValutato = "";
+let ratings = {}, noteCategoria = "", noteFinale = "", ruoloValutato = "", squadraProposta = "";
+const squadreDisponibili = ["Lime","Navy","Orange","Purple","White","Peach","Yellow"];
 let filterRuolo = "", filterLivello = "", filterData = new Set();
 let editingValuationId = null;
 const ruoliDisponibili = ["Banda","Opposto","Palleggiatore","Centrale","Libero","Universale"];
@@ -489,6 +490,9 @@ function showAthlete(id) {
     const ruoloBadge = (ruoloEff && ruoloEff !== f["Ruolo"])
       ? `<span class="badge" style="background:#FEF7EA;color:#92400E;">↔ ${ruoloEff}</span>`
       : "";
+    const squadraBadge = v.fields["Squadra Proposta"]
+      ? `<span class="badge" style="background:#E0F2FE;color:#0369A1;">🏐 ${v.fields["Squadra Proposta"]}</span>`
+      : "";
     const extraBlock = rolePills
       ? `<button class="val-skills-more-btn" id="${skillsId}-btn" onclick="toggleSkillsExtra('${skillsId}')">+ skill ${roleLabel} (${roleCount})</button>
          <div class="val-skills-extra" id="${skillsId}" style="display:none;">
@@ -505,6 +509,7 @@ function showAthlete(id) {
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           <div class="val-coach-name">${coachName}</div>
           ${ruoloBadge}
+          ${squadraBadge}
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="val-avg-badge">&#9733; ${vAvg}</div>
@@ -551,15 +556,16 @@ function showAthlete(id) {
 function showForm(athleteId, valuationId = null) {
   currentAthleteId = athleteId;
   editingValuationId = valuationId;
-  ratings = {}; noteCategoria = ""; noteFinale = ""; ruoloValutato = "";
+  ratings = {}; noteCategoria = ""; noteFinale = ""; ruoloValutato = ""; squadraProposta = "";
 
   const existingVal = valuationId ? valuations.find(v => v.id === valuationId) : null;
   if (existingVal) {
     const allSkills = [...generalSkills, ...Object.values(roleSkills).flat()];
     allSkills.forEach(s => { if (existingVal.fields[s]) ratings[s] = existingVal.fields[s]; });
-    noteCategoria = existingVal.fields["Nota Categoria"] || "";
-    noteFinale    = existingVal.fields["Nota Finale"]    || "";
-    ruoloValutato = existingVal.fields["Ruolo Valutato"] || "";
+    noteCategoria   = existingVal.fields["Nota Categoria"]   || "";
+    noteFinale      = existingVal.fields["Nota Finale"]      || "";
+    ruoloValutato   = existingVal.fields["Ruolo Valutato"]   || "";
+    squadraProposta = existingVal.fields["Squadra Proposta"] || "";
   }
 
   const a = athletes.find(x => x.id === athleteId);
@@ -618,6 +624,11 @@ function showForm(athleteId, valuationId = null) {
     <input class="note-input" type="text" id="note-cat" placeholder="Note sulle skill valutate..." value="${noteCategoria}" oninput="noteCategoria=this.value" style="margin-bottom:4px;">
     <div class="section-title" style="margin-top:12px;">Nota finale</div>
     <textarea class="note-input" id="note-fin" placeholder="Impressioni generali, potenziale, aspetti da sviluppare..." oninput="noteFinale=this.value">${noteFinale}</textarea>
+    <div class="section-title" style="margin-top:16px;">Squadra proposta</div>
+    <select class="form-select" id="squadra-select" style="margin-bottom:4px;" onchange="squadraProposta=this.value">
+      <option value="">— nessuna squadra —</option>
+      ${squadreDisponibili.map(s => `<option value="${s}" ${s === squadraProposta ? "selected" : ""}>${s}</option>`).join("")}
+    </select>
     <button class="save-btn" onclick="submitForm()" id="save-btn">${isEditing ? "💾 Aggiorna valutazione" : "Salva valutazione"}</button>
     <div class="form-msg" id="form-msg"></div>
   `;
@@ -682,6 +693,7 @@ async function submitForm() {
     if (isEditing) {
       const fields = { "Nota Categoria": noteCategoria, "Nota Finale": noteFinale, ...ratings };
       if (ruoloValutato) fields["Ruolo Valutato"] = ruoloValutato;
+      if (squadraProposta) fields["Squadra Proposta"] = squadraProposta;
       res = await airtablePatch("Valutazioni", editingValuationId, fields);
       if (res.id) {
         const idx = valuations.findIndex(v => v.id === res.id);
@@ -690,6 +702,7 @@ async function submitForm() {
     } else {
       const fields = { "Atleta": [currentAthleteId], "Allenatore": [coachId], "Nota Categoria": noteCategoria, "Nota Finale": noteFinale, ...ratings };
       if (ruoloValutato) fields["Ruolo Valutato"] = ruoloValutato;
+      if (squadraProposta) fields["Squadra Proposta"] = squadraProposta;
       res = await airtablePost("Valutazioni", fields);
       if (res.id) valuations.push(res);
     }
