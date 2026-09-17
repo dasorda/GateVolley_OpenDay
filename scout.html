@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GateVolley Scout Live</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 10px; margin: 0; }
+        .scout-container { max-width: 600px; margin: 0 auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        /* Tabellone Punteggio */
+        .scoreboard { display: flex; justify-content: space-around; align-items: center; background: #222; color: #fff; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+        .team-score { font-size: 2.5rem; font-weight: bold; color: #ffeb3b; }
+        .set-counter { font-size: 1rem; color: #aaa; }
+
+        /* Tastierino Numeri di Maglia */
+        .player-selector { margin-bottom: 15px; }
+        .player-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-top: 5px; }
+        .player-btn { padding: 10px 5px; font-weight: bold; background: #eceff1; border: 1px solid #b0bec5; border-radius: 4px; cursor: pointer; }
+
+        /* Campo da Gioco (Layout Pallavolo Reale) */
+        .volleyball-court { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; background: #ff9800; padding: 10px; border: 3px solid #1e88e5; border-radius: 4px; margin-bottom: 15px; aspect-ratio: 4 / 3; }
+        .zone-btn { background: rgba(255, 255, 255, 0.9); border: 1px solid #333; font-size: 1.3rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; min-height: 60px; }
+        
+        /* Controlli Fondamentali ed Esiti */
+        .panel { margin: 10px 0; display: flex; justify-content: space-around; gap: 5px; }
+        .panel button { flex: 1; padding: 12px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-weight: bold;}
+        .btn-skill { background: #e0e0e0; }
+        .btn-effect { color: white; }
+        .btn-plus { background: #2e7d32; } 
+        .btn-minus { background: #c62828; } 
+
+        /* Stati Selezionati */
+        .selected { background: #1e88e5 !important; color: white !important; }
+        
+        /* Log e Storico */
+        .log-area { max-height: 120px; overflow-y: auto; text-align: left; background: #eee; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; margin-bottom: 10px; }
+        .export-btn { background: #1565c0; color: white; width: 100%; padding: 12px; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="scout-container">
+    <!-- 1. TABELLONE PUNTEGGIO AUTOMATICO -->
+    <div class="scoreboard">
+        <div>
+            <div>NOI (Set: <span id="sets-home">0</span>)</div>
+            <div class="team-score" id="score-home">0</div>
+        </div>
+        <div class="set-counter">
+            <div>SET ATTUALE</div>
+            <div id="current-set-display" style="font-size: 1.5rem; font-weight: bold;">#1</div>
+        </div>
+        <div>
+            <div>AVVERSARI (Set: <span id="sets-away">0</span>)</div>
+            <div class="team-score" id="score-away">0</div>
+        </div>
+    </div>
+
+    <!-- 2. SELEZIONE NUMERO GIOCATORE (Esempio maglie più comuni, personalizzabili) -->
+    <div class="player-selector">
+        <strong>Seleziona Giocatore (N° Maglia):</strong>
+        <div class="player-grid">
+            <button class="player-btn" onclick="selectPlayer(1)">1</button>
+            <button class="player-btn" onclick="selectPlayer(2)">2</button>
+            <button class="player-btn" onclick="selectPlayer(3)">3</button>
+            <button class="player-btn" onclick="selectPlayer(4)">4</button>
+            <button class="player-btn" onclick="selectPlayer(5)">5</button>
+            <button class="player-btn" onclick="selectPlayer(7)">7</button>
+            <button class="player-btn" onclick="selectPlayer(8)">8</button>
+            <button class="player-btn" onclick="selectPlayer(9)">9</button>
+            <button class="player-btn" onclick="selectPlayer(10)">10</button>
+            <button class="player-btn" onclick="selectPlayer(11)">11</button>
+            <button class="player-btn" onclick="selectPlayer(13)">13</button>
+            <button class="player-btn" onclick="selectPlayer(18)">18</button>
+        </div>
+    </div>
+
+    <!-- 3. CAMPO DA GIOCO (6 Zone) -->
+    <div class="volleyball-court">
+        <button class="zone-btn" id="zone-4" onclick="selectZone(4)">Z4</button>
+        <button class="zone-btn" id="zone-3" onclick="selectZone(3)">Z3</button>
+        <button class="zone-btn" id="zone-2" onclick="selectZone(2)">Z2</button>
+        <button class="zone-btn" id="zone-5" onclick="selectZone(5)">Z5</button>
+        <button class="zone-btn" id="zone-6" onclick="selectZone(6)">Z6</button>
+        <button class="zone-btn" id="zone-1" onclick="selectZone(1)">Z1</button>
+    </div>
+
+    <!-- 4. PANNELLO FONDAMENTALE -->
+    <div class="panel">
+        <button class="btn-skill" id="skill-S" onclick="selectSkill('S', 'Battuta')">Battuta</button>
+        <button class="btn-skill" id="skill-R" onclick="selectSkill('R', 'Ricezione')">Ricezione</button>
+        <button class="btn-skill" id="skill-A" onclick="selectSkill('A', 'Attacco')">Attacco</button>
+        <button class="btn-skill" id="skill-B" onclick="selectSkill('B', 'Muro')">Muro</button>
+    </div>
+
+    <!-- 5. PANNELLO ESITO (Assegna anche il punto nel tabellone) -->
+    <div class="panel">
+        <button class="btn-effect btn-plus" onclick="registerAction('#', 'home')">🟢 PUNTO NOI (+)</button>
+        <button class="btn-effect btn-minus" onclick="registerAction('=', 'away')">🔴 PUNTO LORO (=)</button>
+    </div>
+
+    <!-- 6. CRONOLOGIA LIVE -->
+    <div class="log-area" id="log-list">Nessuna azione registrata.</div>
+    <button class="export-btn" onclick="exportCSV()">📥 Esporta Dati Partita (CSV)</button>
+</div>
+
+<script>
+    // Stato del punteggio e dei set
+    let scores = { home: 0, away: 0 };
+    let sets = { home: 0, away: 0 };
+    let currentSet = 1;
+
+    // Stato dell'azione corrente
+    let currentData = { player: null, zone: null, skillCode: null, skillName: null };
+    let matchHistory = [];
+
+    function selectPlayer(num) {
+        document.querySelectorAll('.player-btn').forEach(btn => btn.classList.remove('selected'));
+        currentData.player = num;
+        event.target.classList.add('selected');
+    }
+
+    function selectZone(zoneNumber) {
+        document.querySelectorAll('.zone-btn').forEach(btn => btn.classList.remove('selected'));
+        currentData.zone = zoneNumber;
+        document.getElementById(`zone-${zoneNumber}`).classList.add('selected');
+    }
+
+    function selectSkill(code, name) {
+        document.querySelectorAll('.btn-skill').forEach(btn => btn.classList.remove('selected'));
+        currentData.skillCode = code;
+        currentData.skillName = name;
+        document.getElementById(`skill-${code}`).classList.add('selected');
+    }
+
+    // Registra l'azione e gestisce il punteggio automatico
+    function registerAction(effect, pointTo) {
+        if (!currentData.player || !currentData.zone || !currentData.skillCode) {
+            alert("⚠️ Seleziona: 1.Giocatore, 2.Zona, 3.Fondamentale prima di chiudere l'azione!");
+            return;
+        }
+
+        // 1. Aggiorna il punteggio live
+        scores[pointTo]++;
+        
+        // 2. Controllo fine Set (25 punti con scarto di 2, o 15 al quinto set)
+        let targetPoints = (currentSet === 5) ? 15 : 25;
+        if (scores[pointTo] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
+            alert(`🎉 Fine Set ${currentSet}! Vinto da: ${pointTo === 'home' ? 'NOI' : 'AVVERSARI'}`);
+            sets[pointTo]++;
+            // Resetta punteggi per il nuovo set
+            scores.home = 0;
+            scores.away = 0;
+            currentSet++;
+        }
+
+        // Aggiorna la grafica del tabellone
+        document.getElementById('score-home').innerText = scores.home;
+        document.getElementById('score-away').innerText = scores.away;
+        document.getElementById('sets-home').innerText = sets.home;
+        document.getElementById('sets-away').innerText = sets.away;
+        document.getElementById('current-set-display').innerText = `#${currentSet}`;
+
+        // 3. Salva l'azione nello storico
+        const actionRecord = {
+            Orario: new Date().toLocaleTimeString(),
+            Set: currentSet,
+            PunteggioNoi: scores.home,
+            PunteggioLoro: scores.away,
+            Giocatore: currentData.player,
+            Zona: currentData.zone,
+            Fondamentale: currentData.skillName,
+            CodiceFondamentale: currentData.skillCode,
+            Esito: effect === '#' ? 'Punto' : 'Errore',
+            AssegnatoA: pointTo === 'home' ? 'Noi' : 'Loro'
+        };
+
+        matchHistory.push(actionRecord);
+        updateLog();
+
+        // Resetta la selezione per l'azione successiva (mantiene liberi i tasti)
+        document.querySelectorAll('.player-btn, .zone-btn, .btn-skill').forEach(btn => btn.classList.remove('selected'));
+        currentData = { player: null, zone: null, skillCode: null, skillName: null };
+    }
+
+    function updateLog() {
+        const logList = document.getElementById('log-list');
+        if (matchHistory.length === 0) {
+            logList.innerHTML = "Nessuna azione registrata.";
+            return;
+        }
+        logList.innerHTML = matchHistory.map((act, index) => {
+            let emoji = act.Esito === 'Punto' ? '🟢' : '🔴';
+            return `[Set ${act.Set} - ${act.PunteggioNoi}:${act.PunteggioLoro}] P.${act.Giocatore} | ${act.Fondamentale} Z${act.Zona} -> ${emoji} Punto ${act.AssegnatoA}`;
+        }).reverse().join('<br>');
+    }
+
+    function exportCSV() {
+        if (matchHistory.length === 0) {
