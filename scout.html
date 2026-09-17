@@ -10,6 +10,8 @@
         
         /* Configurazione Iniziale */
         .setup-screen { background: #eceff1; padding: 20px; border-radius: 6px; margin-bottom: 15px; border: 2px dashed #b0bec5; }
+        .setup-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .setup-row input { flex: 1; padding: 8px; border: 1px solid #cfd8dc; border-radius: 4px; font-size: 1rem; }
         .setup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; aspect-ratio: 4 / 3; }
         .setup-input-box { background: white; border: 1px solid #90a4ae; border-radius: 4px; display: flex; flex-direction: column; padding: 8px; justify-content: center; }
         .setup-input-box label { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #37474f; }
@@ -17,27 +19,23 @@
         .start-btn { background: #2e7d32; color: white; border: none; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; }
         .radio-group { margin: 10px 0; padding: 10px; background: white; border-radius: 4px; border: 1px solid #cfd8dc; }
 
-        /* AGGIORNATO: Tabellone con il gradiente arcobaleno ufficiale fedele all'header originale */
+        /* Struttura base del Tabellone con il gradiente GateVolley inline */
         .scoreboard { 
             display: flex; 
             justify-content: space-around; 
             align-items: center; 
-            background: linear-gradient(90deg, #e11d48 0%, #ea580c 20%, #eab308 40%, #16a34a 60%, #2563eb 100%) !important;
-            color: #ffffff !important; 
             padding: 18px 15px; 
             border-radius: 8px; 
             margin-bottom: 15px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .team-box { flex: 1; text-align: center; padding: 5px; position: relative; }
+        .team-box div { color: #ffffff !important; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+        .team-score { font-size: 2.8rem; font-weight: 900; color: #ffffff !important; margin-top: 3px; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); }
         
-        /* Forzato il bianco sui testi per garantire la massima leggibilità sopra l'arcobaleno */
-        .team-box div { color: #ffffff !important; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.6); }
-        .team-score { font-size: 2.8rem; font-weight: 900; color: #ffffff !important; margin-top: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); }
-        
-        .ball-indicator { font-size: 1.3rem; visibility: hidden; display: inline-block; margin-left: 5px; vertical-align: middle; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5)); }
+        .ball-indicator { font-size: 1.3rem; visibility: hidden; display: inline-block; margin-left: 5px; vertical-align: middle; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.6)); }
         .has-service { visibility: visible !important; animation: pulse 1.5s infinite; }
-        .rally-id-display { font-size: 0.85rem; color: #ffffff !important; font-family: monospace; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); }
+        .rally-id-display { font-size: 0.85rem; color: #ffffff !important; font-family: monospace; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
         /* Campo da Gioco Posizionale */
         .volleyball-court { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #ff9800; padding: 12px; border: 3px solid #1e88e5; border-radius: 4px; margin-bottom: 15px; aspect-ratio: 4 / 3; }
@@ -75,9 +73,19 @@
 <body>
 <div class="scout-container">
 
-    <!-- CONFIGURAZIONE INIZIALE -->
+    <!-- SETUP INIZIALE CON CODICE PARTITA E NOMI SQUADRE -->
     <div id="setup-panel" class="setup-screen">
-        <h3>📋 Configurazione Formazione Iniziale</h3>
+        <h3>📋 Configurazione Gara e Formazione</h3>
+        
+        <div class="setup-row">
+            <input type="text" id="input-match-id" placeholder="ID Partita (es. Gara_01 o Data_Avversario)" value="GARA_01">
+        </div>
+        <div class="setup-row">
+            <input type="text" id="input-team-home" placeholder="Nome Tua Squadra (NOI)" value="GateVolley">
+            <input type="text" id="input-team-away" placeholder="Nome Squadra Ospite" value="AVVERSARI">
+        </div>
+
+        <p style="font-size: 0.9rem; margin: 15px 0 5px 0; font-weight: bold; color: #455a64;">Inserisci i numeri di maglia del Sestetto:</p>
         <div class="setup-grid">
             <div class="setup-input-box"><label>P4 (Avanti-Sx)</label><input type="number" id="input-p4" placeholder="N°"></div>
             <div class="setup-input-box"><label>P3 (Avanti-Cc)</label><input type="number" id="input-p3" placeholder="N°"></div>
@@ -98,22 +106,22 @@
     <!-- PANNELLO DI GIOCO -->
     <div id="scout-game-panel" style="display: none;">
         
-        <!-- Tabellone con il gradiente GateVolley Arcobaleno -->
-        <div class="scoreboard">
+        <!-- Tabellone con gradiente Arcobaleno blindato via inline style per ignorare la vecchia cache -->
+        <div class="scoreboard" style="background: linear-gradient(90deg, #e11d48 0%, #ea580c 20%, #eab308 40%, #16a34a 60%, #2563eb 100%) !important;">
             <div class="team-box">
-                <div style="font-size: 1.1rem;">NOI <span id="ball-home" class="ball-indicator">🏐</span></div>
+                <div style="font-size: 1.1rem;"><span id="display-name-home">NOI</span> <span id="ball-home" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-home">0</div>
-                <div style="font-size: 0.8rem;">Set vinti: <span id="sets-home">0</span></div>
+                <div style="font-size: 0.8rem;">Set: <span id="sets-home">0</span></div>
             </div>
-            <div style="padding: 0 10px; min-width: 120px;">
-                <div style="font-size: 1.3rem; font-weight: 900; letter-spacing: 1px; color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">GateVolley</div>
+            <div style="padding: 0 5px; min-width: 120px;">
+                <div id="display-match-id" style="font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">GateVolley</div>
                 <div style="font-size: 0.8rem; color: #ffffff !important; font-weight: bold; margin-top: 3px; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">SET <span id="current-set-display">1</span></div>
                 <div class="rally-id-display" id="rally-id-display" style="margin-top: 4px;">RALLY: #1</div>
             </div>
             <div class="team-box">
-                <div style="font-size: 1.1rem;">AVVERSARI <span id="ball-away" class="ball-indicator">🏐</span></div>
+                <div style="font-size: 1.1rem;"><span id="display-name-away">AVVERSARI</span> <span id="ball-away" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-away">0</div>
-                <div style="font-size: 0.8rem;">Set vinti: <span id="sets-away">0</span></div>
+                <div style="font-size: 0.8rem;">Set: <span id="sets-away">0</span></div>
             </div>
         </div>
 
@@ -153,6 +161,11 @@ let scores = { home: 0, away: 0 };
 let sets = { home: 0, away: 0 };
 let currentSet = 1;
 
+// Dati anagrafici del match inseriti dall'utente
+let matchID = "GARA_01";
+let teamNameHome = "GateVolley";
+let teamNameAway = "AVVERSARI";
+
 // Gestione dei Rally e del Possesso Servizio ('home' o 'away')
 let rallyCounter = 1;
 let currentService = 'home'; 
@@ -161,20 +174,37 @@ let currentService = 'home';
 let currentData = { player: null, position: null, skillCode: null, skillName: null };
 let matchHistory = [];
 
-// Inizia la partita salvando formazione e primo possesso palla
+// Inizia la partita salvando anagrafica gara, formazione e primo possesso palla
 function confirmFormation() {
+    // 1. Recupera i dati della partita e delle squadre
+    const inputMatch = document.getElementById('input-match-id').value.trim();
+    const inputHome = document.getElementById('input-team-home').value.trim();
+    const inputAway = document.getElementById('input-team-away').value.trim();
+
+    if (inputMatch) matchID = inputMatch;
+    if (inputHome) teamNameHome = inputHome;
+    if (inputAway) teamNameAway = inputAway;
+
+    // 2. Recupera la formazione dei 6 giocatori
     for (let p = 1; p <= 6; p++) {
         let val = document.getElementById('input-p' + p).value;
         if (!val) { 
-            alert("⚠️ Compila tutte le posizioni prima di iniziare!"); 
+            alert("⚠️ Compila tutte le posizioni dei giocatori prima di iniziare!"); 
             return; 
         }
         formation[p] = parseInt(val, 10);
     }
 
+    // 3. Imposta chi batte per primo
     const serviceRadio = document.querySelector('input[name="first-service"]:checked');
     currentService = serviceRadio ? serviceRadio.value : 'home';
 
+    // 4. Aggiorna le etichette di testo visibili a schermo sul tabellone
+    document.getElementById('display-match-id').innerText = matchID;
+    document.getElementById('display-name-home').innerText = teamNameHome;
+    document.getElementById('display-name-away').innerText = teamNameAway;
+
+    // 5. Cambia schermata
     document.getElementById('setup-panel').style.display = 'none';
     document.getElementById('scout-game-panel').style.display = 'block';
     
@@ -287,7 +317,7 @@ function pressVote(voteSymbol) {
 
         let targetPoints = (currentSet === 5) ? 15 : 25;
         if (scores[pointTo] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
-            alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (pointTo === 'home' ? 'NOI' : 'AVVERSARI'));
+            alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (pointTo === 'home' ? teamNameHome : teamNameAway));
             sets[pointTo]++;
             scores.home = 0;
             scores.away = 0;
@@ -300,13 +330,15 @@ function pressVote(voteSymbol) {
     if (currentData.skillCode === 'A' && voteSymbol === '#') voteText = "# Vincente";
     if (voteSymbol === '=') voteText = "= Errore";
 
+    // AGGIORNATO: Ogni record include stabilmente ID_Partita, ID_Set e i nomi corretti delle squadre
     const actionRecord = {
+        ID_Partita: matchID,
+        ID_Set: "SET_" + currentSet,
         RallyID: "R_" + rallyCounter,
         Orario: new Date().toLocaleTimeString(),
-        Set: currentSet,
         PunteggioNoi: scores.home,
         PunteggioLoro: scores.away,
-        ServizioA: currentService === 'home' ? 'Noi' : 'Loro',
+        ServizioA: currentService === 'home' ? teamNameHome : teamNameAway,
         RotazioneEseguita: rotationHappened ? 'SI' : 'NO',
         Giocatore: currentData.player,
         Posizione: 'P' + currentData.position,
@@ -351,12 +383,13 @@ function updateLog() {
     }).reverse().join('<br>');
 }
 
+// AGGIORNATO: Esportazione modificata per includere le colonne anagrafiche in cima al file Excel
 function exportCSV() {
     if (matchHistory.length === 0) {
         alert("Nessun dato da esportare!");
         return;
     }
-    const headers = ["RallyID", "Orario", "Set", "PunteggioNoi", "PunteggioLoro", "ServizioA", "RotazioneEseguita", "Giocatore", "Posizione", "Fondamentale", "Voto"];
+    const headers = ["ID_Partita", "ID_Set", "RallyID", "Orario", "PunteggioNoi", "PunteggioLoro", "ServizioA", "RotazioneEseguita", "Giocatore", "Posizione", "Fondamentale", "Voto"];
     const csvRows = [headers.join(",")];
     
     matchHistory.forEach(row => {
@@ -368,11 +401,7 @@ function exportCSV() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "scout_partita_gatevolley.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    link.setAttribute("download", "scout_" + matchID + ".csv");
+	document.body.appendChild(link);link.click();
+	document.body.removeChild(link);
 }
-</script>
-</body>
-</html>
