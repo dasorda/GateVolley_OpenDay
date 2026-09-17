@@ -31,7 +31,27 @@
         }
         .team-box { flex: 1; text-align: center; padding: 5px; position: relative; }
         .team-box div { color: #ffffff !important; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        .team-score { font-size: 2.8rem; font-weight: 900; color: #ffffff !important; margin-top: 3px; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); }
+        .team-score { font-size: 2.8rem; font-weight: 900; color: #ffffff !important; margin: 2px 0; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); }
+        
+        /* Contenitore e bottoni sintetici (E, P, +) sotto i punteggi */
+        .score-actions-row { display: flex; justify-content: center; gap: 6px; margin-top: 5px; }
+        .score-action-btn { 
+            background: rgba(255, 255, 255, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.5); 
+            color: white !important; 
+            font-size: 0.9rem; 
+            font-weight: 800; 
+            width: 32px;
+            height: 32px;
+            line-height: 30px;
+            border-radius: 50%; 
+            cursor: pointer; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            padding: 0;
+            text-align: center;
+            display: inline-block;
+        }
+        .score-action-btn:active { background: rgba(255, 255, 255, 0.4); }
         
         .ball-indicator { font-size: 1.3rem; visibility: hidden; display: inline-block; margin-left: 5px; vertical-align: middle; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.6)); }
         .has-service { visibility: visible !important; animation: pulse 1.5s infinite; }
@@ -103,14 +123,14 @@
         <button class="start-btn" onclick="confirmFormation()">✅ Inizia Partita</button>
     </div>
 
-    <!-- 2. PANNELLO INTERMEDIO NUOVO SET (Mostrato solo a fine set) -->
+    <!-- 2. PANNELLO INTERMEDIO NUOVO SET -->
     <div id="next-set-panel" class="modal-set-panel" style="display: none;">
         <h3 id="next-set-title">🔄 Configurazione Set 2</h3>
         <p style="font-size: 0.9rem; margin: 0 0 10px 0; color: #37474f;">Conferma o modifica la formazione per il prossimo set:</p>
         
         <div class="setup-grid">
             <div class="setup-input-box"><label>P4 (Avanti-Sx)</label><input type="number" id="next-p4" placeholder="N°"></div>
-            <div class="setup-input-box"><label>P3 (Avanti-Cc)</label><input type="number" id="input-next-p3" placeholder="N°" id="next-p3"> <!-- Sincronizzato via JS usando classi/ID univoci --> <input type="number" id="next-p3" placeholder="N°"></div>
+            <div class="setup-input-box"><label>P3 (Avanti-Cc)</label><input type="number" id="next-p3" placeholder="N°"></div>
             <div class="setup-input-box"><label>P2 (Avanti-Dx)</label><input type="number" id="next-p2" placeholder="N°"></div>
             <div class="setup-input-box"><label>P5 (Dietro-Sx)</label><input type="number" id="next-p5" placeholder="N°"></div>
             <div class="setup-input-box"><label>P6 (Dietro-Cc)</label><input type="number" id="next-p6" placeholder="N°"></div>
@@ -125,13 +145,18 @@
         <button class="start-btn" style="background: #1565c0;" onclick="startNextSet()">🏐 Conferma e Inizia Set</button>
     </div>
 
-    <!-- 3. INTERFACCIA PRINCIPALE DI GIOCO -->
+    <!-- 3. INTERFACCIA DI GIOCO PRINCIPALE -->
     <div id="scout-game-panel" style="display: none;">
         <div class="scoreboard" style="background: linear-gradient(90deg, #e11d48 0%, #ea580c 20%, #eab308 40%, #16a34a 60%, #2563eb 100%) !important;">
             <div class="team-box">
                 <div style="font-size: 1.1rem;"><span id="display-name-home">NOI</span> <span id="ball-home" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-home">0</div>
                 <div style="font-size: 0.8rem;">Set vinti: <span id="sets-home">0</span></div>
+                <!-- AGGIORNATO: Bottoni sintetici compatti per Noi -->
+                <div class="score-actions-row">
+                    <button class="score-action-btn" title="Errore Avversario (Regalo)" onclick="addDirectPoint('home', 'ERRORE_AVVERSARIO', 'E')">E</button>
+                    <button class="score-action-btn" title="Incremento Manuale" onclick="addDirectPoint('home', 'PUNTO_MANUALE', '+')">+</button>
+                </div>
             </div>
             <div style="padding: 0 5px; min-width: 120px;">
                 <div id="display-match-id" style="font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">GateVolley</div>
@@ -142,6 +167,12 @@
                 <div style="font-size: 1.1rem;"><span id="display-name-away">AVVERSARI</span> <span id="ball-away" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-away">0</div>
                 <div style="font-size: 0.8rem;">Set vinti: <span id="sets-away">0</span></div>
+                <!-- AGGIORNATO: Bottoni sintetici compatti per gli Avversari -->
+                <div class="score-actions-row">
+                    <button class="score-action-btn" title="Punto Avversario (Giocata)" onclick="addDirectPoint('away', 'PUNTO_AVVERSARIO', 'P')">P</button>
+                    <button class="score-action-btn" title="Errore Nostro Generico" onclick="addDirectPoint('away', 'ERRORE_GENERICO_NOI', 'E')">E</button>
+                    <button class="score-action-btn" title="Incremento Manuale" onclick="addDirectPoint('away', 'PUNTO_MANUALE', '+')">+</button>
+                </div>
             </div>
         </div>
 
@@ -229,24 +260,18 @@ function confirmFormation() {
 
 // Gestisce l'apertura del pannello del nuovo set precompilando i dati esistenti
 function openNextSetPanel() {
-    // Blocca visivamente il pannello di gioco principale
     document.getElementById('scout-game-panel').style.display = 'none';
-    
-    // Aggiorna l'intestazione testuale del modulo
     document.getElementById('next-set-title').innerText = "🔄 Configurazione Set " + currentSet;
     
-    // Precompila automaticamente le 6 caselle di input con i numeri attuali
     for (let p = 1; p <= 6; p++) {
         document.getElementById('next-p' + p).value = formation[p];
     }
     
-    // Mostra la schermata intermedia per confermare eventuali cambi
     document.getElementById('next-set-panel').style.display = 'block';
 }
 
 // Avvia effettivamente il nuovo set dopo la conferma del sestetto
 function startNextSet() {
-    // Salva i nuovi numeri impostati (con gli eventuali cambi)
     for (let p = 1; p <= 6; p++) {
         let val = document.getElementById('next-p' + p).value;
         if (!val) { 
@@ -256,15 +281,12 @@ function startNextSet() {
         formation[p] = parseInt(val, 10);
     }
 
-    // Imposta il possesso di battuta per il nuovo set
     const serviceRadio = document.querySelector('input[name="next-service"]:checked');
     currentService = serviceRadio ? serviceRadio.value : 'home';
 
-    // Nasconde il modulo intermedio e riapre il campo a punteggio azzerato
     document.getElementById('next-set-panel').style.display = 'none';
     document.getElementById('scout-game-panel').style.display = 'block';
     
-    // Sincronizza ed esegue il refresh della grafica del campo da gioco
     updateCourtDisplay();
     updateRallyDisplay();
 }
@@ -295,11 +317,11 @@ function rotateTeam() {
     let t6 = formation[6];
 
     formation[1] = t2;
-    formation[6] = t1;
-    formation[5] = t6;
-    formation[4] = t5;
-    formation[3] = t4;
     formation[2] = t3;
+    formation[3] = t4;
+    formation[4] = t5;
+    formation[5] = t6;
+    formation[6] = t1;
 }
 
 function selectCourtPosition(posNumber) {
@@ -370,13 +392,10 @@ function pressVote(voteSymbol) {
         
         currentService = pointTo;
 
-        // Controllo fine Set (25 punti o 15 al quinto set, con scarto di 2)
         let targetPoints = (currentSet === 5) ? 15 : 25;
         if (scores[pointTo] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
             alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (pointTo === 'home' ? teamNameHome : teamNameAway));
             sets[pointTo]++;
-            
-            // Incrementa il contatore globale del set e azzera i punteggi parziali
             currentSet++;
             scores.home = 0;
             scores.away = 0;
@@ -389,7 +408,6 @@ function pressVote(voteSymbol) {
     if (currentData.skillCode === 'A' && voteSymbol === '#') voteText = "# Vincente";
     if (voteSymbol === '=') voteText = "= Errore";
 
-    // Registra l'azione legandola al set in cui è avvenuta prima dell'eventuale incremento
     const actionRecord = {
         ID_Partita: matchID,
         ID_Set: "SET_" + (setFinished ? (currentSet - 1) : currentSet),
@@ -413,14 +431,12 @@ function pressVote(voteSymbol) {
         rallyCounter++;
     }
 
-    // Aggiorna l'interfaccia grafica stabile del tabellone
     document.getElementById('score-home').innerText = scores.home;
     document.getElementById('score-away').innerText = scores.away;
     document.getElementById('sets-home').innerText = sets.home;
     document.getElementById('sets-away').innerText = sets.away;
     document.getElementById('current-set-display').innerText = currentSet;
     
-    // Se il set è finito, apri lo schermo intermedio prima di aggiornare il campo da gioco
     if (setFinished) {
         openNextSetPanel();
     } else {
@@ -430,6 +446,74 @@ function pressVote(voteSymbol) {
 
     document.querySelectorAll('.position-btn, .btn-skill').forEach(btn => btn.classList.remove('selected'));
     currentData = { player: null, position: null, skillCode: null, skillName: null };
+}
+
+// NUOVA FUNZIONE: Gestisce l'assegnazione dei 4 casi veloci (E, P, +) dal tabellone
+function addDirectPoint(team, pointType, codeSymbol) {
+    // 1. Assegna il punto alla squadra corretta
+    scores[team]++;
+    
+    let rotationHappened = false;
+    let setFinished = false;
+
+    // Se il punto va a Noi e servivano loro, esegue il Cambio Palla e RUOTA la squadra
+    if (team === 'home' && currentService === 'away' && pointType !== 'PUNTO_MANUALE') {
+        rotateTeam();
+        rotationHappened = true;
+    }
+    
+    // Il possesso palla si sposta solo se non è un riallineamento manuale neutro
+    if (pointType !== 'PUNTO_MANUALE') {
+        currentService = team;
+    }
+
+    // Controllo fine Set
+    let targetPoints = (currentSet === 5) ? 15 : 25;
+    if (scores[team] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
+        alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (team === 'home' ? teamNameHome : teamNameAway));
+        sets[team]++;
+        currentSet++;
+        scores.home = 0;
+        scores.away = 0;
+        setFinished = true;
+    }
+
+    // 2. Crea il record per il database (Giocatore = 0, Posizione = N/D per non inquinare)
+    const actionRecord = {
+        ID_Partita: matchID,
+        ID_Set: "SET_" + (setFinished ? (currentSet - 1) : currentSet),
+        RallyID: "R_" + rallyCounter,
+        Orario: new Date().toLocaleTimeString(),
+        PunteggioNoi: scores.home,
+        PunteggioLoro: scores.away,
+        ServizioA: currentService === 'home' ? teamNameHome : teamNameAway,
+        RotazioneEseguita: rotationHappened ? 'SI' : 'NO',
+        Giocatore: 0,
+        Posizione: "N/D",
+        Fondamentale: pointType,
+        Voto: codeSymbol,
+        DettaglioVoto: codeSymbol + " (" + pointType + ")"
+    };
+
+    matchHistory.push(actionRecord);
+    updateLog();
+
+    // Chiude lo scambio incrementando il RallyID
+    rallyCounter++;
+
+    // 3. Rinfresca l'interfaccia visiva
+    document.getElementById('score-home').innerText = scores.home;
+    document.getElementById('score-away').innerText = scores.away;
+    document.getElementById('sets-home').innerText = sets.home;
+    document.getElementById('sets-away').innerText = sets.away;
+    document.getElementById('current-set-display').innerText = currentSet;
+    
+    if (setFinished) {
+        openNextSetPanel();
+    } else {
+        updateCourtDisplay();
+        updateRallyDisplay();
+    }
 }
 
 function updateRallyDisplay() {
