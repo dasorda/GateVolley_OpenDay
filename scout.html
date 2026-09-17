@@ -8,8 +8,8 @@
         body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 10px; margin: 0; }
         .scout-container { max-width: 600px; margin: 0 auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        /* Configurazione Iniziale */
-        .setup-screen { background: #eceff1; padding: 20px; border-radius: 6px; margin-bottom: 15px; border: 2px dashed #b0bec5; }
+        /* Configurazione Iniziale e Cambio Set */
+        .setup-screen, .modal-set-panel { background: #eceff1; padding: 20px; border-radius: 6px; margin-bottom: 15px; border: 2px dashed #b0bec5; }
         .setup-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .setup-row input { flex: 1; padding: 8px; border: 1px solid #cfd8dc; border-radius: 4px; font-size: 1rem; }
         .setup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; aspect-ratio: 4 / 3; }
@@ -73,19 +73,19 @@
 <body>
 <div class="scout-container">
 
-    <!-- SETUP INIZIALE CON CODICE PARTITA E NOMI SQUADRE -->
+    <!-- 1. SCHERMATA SETUP INIZIALE (SET 1) -->
     <div id="setup-panel" class="setup-screen">
         <h3>📋 Configurazione Gara e Formazione</h3>
         
         <div class="setup-row">
-            <input type="text" id="input-match-id" placeholder="ID Partita (es. Gara_01 o Data_Avversario)" value="GARA_01">
+            <input type="text" id="input-match-id" placeholder="ID Partita (es. Gara_01)" value="GARA_01">
         </div>
         <div class="setup-row">
             <input type="text" id="input-team-home" placeholder="Nome Tua Squadra (NOI)" value="GateVolley">
             <input type="text" id="input-team-away" placeholder="Nome Squadra Ospite" value="AVVERSARI">
         </div>
 
-        <p style="font-size: 0.9rem; margin: 15px 0 5px 0; font-weight: bold; color: #455a64;">Inserisci i numeri di maglia del Sestetto:</p>
+        <p style="font-size: 0.9rem; margin: 15px 0 5px 0; font-weight: bold; color: #455a64;">Sestetto di partenza (Set 1):</p>
         <div class="setup-grid">
             <div class="setup-input-box"><label>P4 (Avanti-Sx)</label><input type="number" id="input-p4" placeholder="N°"></div>
             <div class="setup-input-box"><label>P3 (Avanti-Cc)</label><input type="number" id="input-p3" placeholder="N°"></div>
@@ -103,15 +103,35 @@
         <button class="start-btn" onclick="confirmFormation()">✅ Inizia Partita</button>
     </div>
 
-    <!-- PANNELLO DI GIOCO -->
-    <div id="scout-game-panel" style="display: none;">
+    <!-- 2. PANNELLO INTERMEDIO NUOVO SET (Mostrato solo a fine set) -->
+    <div id="next-set-panel" class="modal-set-panel" style="display: none;">
+        <h3 id="next-set-title">🔄 Configurazione Set 2</h3>
+        <p style="font-size: 0.9rem; margin: 0 0 10px 0; color: #37474f;">Conferma o modifica la formazione per il prossimo set:</p>
         
-        <!-- Tabellone con gradiente Arcobaleno blindato via inline style per ignorare la vecchia cache -->
+        <div class="setup-grid">
+            <div class="setup-input-box"><label>P4 (Avanti-Sx)</label><input type="number" id="next-p4" placeholder="N°"></div>
+            <div class="setup-input-box"><label>P3 (Avanti-Cc)</label><input type="number" id="input-next-p3" placeholder="N°" id="next-p3"> <!-- Sincronizzato via JS usando classi/ID univoci --> <input type="number" id="next-p3" placeholder="N°"></div>
+            <div class="setup-input-box"><label>P2 (Avanti-Dx)</label><input type="number" id="next-p2" placeholder="N°"></div>
+            <div class="setup-input-box"><label>P5 (Dietro-Sx)</label><input type="number" id="next-p5" placeholder="N°"></div>
+            <div class="setup-input-box"><label>P6 (Dietro-Cc)</label><input type="number" id="next-p6" placeholder="N°"></div>
+            <div class="setup-input-box"><label>P1 (Dietro-Dx)</label><input type="number" id="next-p1" placeholder="N°"></div>
+        </div>
+
+        <div class="radio-group">
+            <strong>Chi serve per primo in questo set?</strong><br><br>
+            <label><input type="radio" name="next-service" value="home" checked> NOI</label> &nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="radio" name="next-service" value="away"> AVVERSARI</label>
+        </div>
+        <button class="start-btn" style="background: #1565c0;" onclick="startNextSet()">🏐 Conferma e Inizia Set</button>
+    </div>
+
+    <!-- 3. INTERFACCIA PRINCIPALE DI GIOCO -->
+    <div id="scout-game-panel" style="display: none;">
         <div class="scoreboard" style="background: linear-gradient(90deg, #e11d48 0%, #ea580c 20%, #eab308 40%, #16a34a 60%, #2563eb 100%) !important;">
             <div class="team-box">
                 <div style="font-size: 1.1rem;"><span id="display-name-home">NOI</span> <span id="ball-home" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-home">0</div>
-                <div style="font-size: 0.8rem;">Set: <span id="sets-home">0</span></div>
+                <div style="font-size: 0.8rem;">Set vinti: <span id="sets-home">0</span></div>
             </div>
             <div style="padding: 0 5px; min-width: 120px;">
                 <div id="display-match-id" style="font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">GateVolley</div>
@@ -121,7 +141,7 @@
             <div class="team-box">
                 <div style="font-size: 1.1rem;"><span id="display-name-away">AVVERSARI</span> <span id="ball-away" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-away">0</div>
-                <div style="font-size: 0.8rem;">Set: <span id="sets-away">0</span></div>
+                <div style="font-size: 0.8rem;">Set vinti: <span id="sets-away">0</span></div>
             </div>
         </div>
 
@@ -174,7 +194,7 @@ let currentService = 'home';
 let currentData = { player: null, position: null, skillCode: null, skillName: null };
 let matchHistory = [];
 
-// Inizia la partita salvando anagrafica gara, formazione e primo possesso palla
+// Inizia la partita (Set 1) salvando anagrafica gara, formazione e primo possesso palla
 function confirmFormation() {
     const inputMatch = document.getElementById('input-match-id').value.trim();
     const inputHome = document.getElementById('input-team-home').value.trim();
@@ -207,7 +227,48 @@ function confirmFormation() {
     updateRallyDisplay();
 }
 
-// Aggiorna i numeri sul campo, evidenzia chi è in P1 e sposta l'icona del servizio (🏐)
+// Gestisce l'apertura del pannello del nuovo set precompilando i dati esistenti
+function openNextSetPanel() {
+    // Blocca visivamente il pannello di gioco principale
+    document.getElementById('scout-game-panel').style.display = 'none';
+    
+    // Aggiorna l'intestazione testuale del modulo
+    document.getElementById('next-set-title').innerText = "🔄 Configurazione Set " + currentSet;
+    
+    // Precompila automaticamente le 6 caselle di input con i numeri attuali
+    for (let p = 1; p <= 6; p++) {
+        document.getElementById('next-p' + p).value = formation[p];
+    }
+    
+    // Mostra la schermata intermedia per confermare eventuali cambi
+    document.getElementById('next-set-panel').style.display = 'block';
+}
+
+// Avvia effettivamente il nuovo set dopo la conferma del sestetto
+function startNextSet() {
+    // Salva i nuovi numeri impostati (con gli eventuali cambi)
+    for (let p = 1; p <= 6; p++) {
+        let val = document.getElementById('next-p' + p).value;
+        if (!val) { 
+            alert("⚠️ Compila tutte le posizioni prima di ripartire!"); 
+            return; 
+        }
+        formation[p] = parseInt(val, 10);
+    }
+
+    // Imposta il possesso di battuta per il nuovo set
+    const serviceRadio = document.querySelector('input[name="next-service"]:checked');
+    currentService = serviceRadio ? serviceRadio.value : 'home';
+
+    // Nasconde il modulo intermedio e riapre il campo a punteggio azzerato
+    document.getElementById('next-set-panel').style.display = 'none';
+    document.getElementById('scout-game-panel').style.display = 'block';
+    
+    // Sincronizza ed esegue il refresh della grafica del campo da gioco
+    updateCourtDisplay();
+    updateRallyDisplay();
+}
+
 function updateCourtDisplay() {
     for (let p = 1; p <= 6; p++) {
         const btn = document.getElementById('court-p' + p);
@@ -225,7 +286,6 @@ function updateCourtDisplay() {
     }
 }
 
-// Esegue la rotazione reale in senso orario (P2 -> P1 -> P6 -> P5 -> P4 -> P3 -> P2)
 function rotateTeam() {
     let t1 = formation[1];
     let t2 = formation[2];
@@ -235,11 +295,11 @@ function rotateTeam() {
     let t6 = formation[6];
 
     formation[1] = t2;
-    formation[2] = t3;
-    formation[3] = t4;
-    formation[4] = t5;
-    formation[5] = t6;
     formation[6] = t1;
+    formation[5] = t6;
+    formation[4] = t5;
+    formation[3] = t4;
+    formation[2] = t3;
 }
 
 function selectCourtPosition(posNumber) {
@@ -298,6 +358,7 @@ function pressVote(voteSymbol) {
     }
 
     let rotationHappened = false;
+    let setFinished = false;
 
     if (isTerminalAction && pointTo) {
         scores[pointTo]++;
@@ -309,13 +370,17 @@ function pressVote(voteSymbol) {
         
         currentService = pointTo;
 
+        // Controllo fine Set (25 punti o 15 al quinto set, con scarto di 2)
         let targetPoints = (currentSet === 5) ? 15 : 25;
         if (scores[pointTo] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
             alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (pointTo === 'home' ? teamNameHome : teamNameAway));
             sets[pointTo]++;
+            
+            // Incrementa il contatore globale del set e azzera i punteggi parziali
+            currentSet++;
             scores.home = 0;
             scores.away = 0;
-            currentSet++;
+            setFinished = true;
         }
     }
 
@@ -324,10 +389,10 @@ function pressVote(voteSymbol) {
     if (currentData.skillCode === 'A' && voteSymbol === '#') voteText = "# Vincente";
     if (voteSymbol === '=') voteText = "= Errore";
 
-    // Registra ogni record con ID_Partita, ID_Set e i nomi corretti delle squadre
+    // Registra l'azione legandola al set in cui è avvenuta prima dell'eventuale incremento
     const actionRecord = {
         ID_Partita: matchID,
-        ID_Set: "SET_" + currentSet,
+        ID_Set: "SET_" + (setFinished ? (currentSet - 1) : currentSet),
         RallyID: "R_" + rallyCounter,
         Orario: new Date().toLocaleTimeString(),
         PunteggioNoi: scores.home,
@@ -348,14 +413,20 @@ function pressVote(voteSymbol) {
         rallyCounter++;
     }
 
+    // Aggiorna l'interfaccia grafica stabile del tabellone
     document.getElementById('score-home').innerText = scores.home;
     document.getElementById('score-away').innerText = scores.away;
     document.getElementById('sets-home').innerText = sets.home;
     document.getElementById('sets-away').innerText = sets.away;
     document.getElementById('current-set-display').innerText = currentSet;
     
-    updateCourtDisplay();
-    updateRallyDisplay();
+    // Se il set è finito, apri lo schermo intermedio prima di aggiornare il campo da gioco
+    if (setFinished) {
+        openNextSetPanel();
+    } else {
+        updateCourtDisplay();
+        updateRallyDisplay();
+    }
 
     document.querySelectorAll('.position-btn, .btn-skill').forEach(btn => btn.classList.remove('selected'));
     currentData = { player: null, position: null, skillCode: null, skillName: null };
