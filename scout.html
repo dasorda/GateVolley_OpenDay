@@ -17,19 +17,19 @@
         .start-btn { background: #2e7d32; color: white; border: none; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; }
         .radio-group { margin: 10px 0; padding: 10px; background: white; border-radius: 4px; border: 1px solid #cfd8dc; }
 
-        /* MODIFICATO: Tabellone con lo sfondo originale GateVolley (Gradiente + Grid Pattern) */
+        /* Tabellone con lo sfondo originale GateVolley (Gradiente + Grid Pattern) */
         .scoreboard { 
             display: flex; 
             justify-content: space-around; 
             align-items: center; 
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); /* Sfondo scuro del sito */
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
             background-size: 20px 20px;
             color: #fff; 
             padding: 15px; 
             border-radius: 6px; 
             margin-bottom: 15px; 
-            border-bottom: 3px solid #3b82f6; /* Dettaglio azzurro GateVolley */
+            border-bottom: 3px solid #3b82f6;
         }
         .team-box { flex: 1; text-align: center; padding: 5px; position: relative; }
         .team-score { font-size: 2.5rem; font-weight: bold; color: #ffeb3b; margin-top: 5px; }
@@ -73,7 +73,7 @@
 <body>
 <div class="scout-container">
 
-    <!-- SETUP INIZIALE -->
+    <!-- CONFIGURAZIONE INIZIALE -->
     <div id="setup-panel" class="setup-screen">
         <h3>📋 Configurazione Formazione Iniziale</h3>
         <div class="setup-grid">
@@ -90,14 +90,11 @@
             <label><input type="radio" name="first-service" value="home" checked> NOI</label> &nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="radio" name="first-service" value="away"> AVVERSARI</label>
         </div>
-        
         <button class="start-btn" onclick="confirmFormation()">✅ Inizia Partita</button>
     </div>
 
     <!-- PANNELLO DI GIOCO -->
     <div id="scout-game-panel" style="display: none;">
-        
-        <!-- MODIFICATO: Inserito titolo stilizzato GateVolley al centro dello sfondo gradiente -->
         <div class="scoreboard">
             <div class="team-box">
                 <div>NOI <span id="ball-home" class="ball-indicator">🏐</span></div>
@@ -145,3 +142,233 @@
         <button class="export-btn" onclick="exportCSV()">📥 Esporta Report CSV (Excel)</button>
     </div>
 </div>
+<script>
+// Configurazione iniziale e stati stabili
+let formation = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
+let scores = { home: 0, away: 0 };
+let sets = { home: 0, away: 0 };
+let currentSet = 1;
+
+// Gestione dei Rally e del Possesso Servizio ('home' o 'away')
+let rallyCounter = 1;
+let currentService = 'home'; 
+
+// Stato dell'azione corrente
+let currentData = { player: null, position: null, skillCode: null, skillName: null };
+let matchHistory = [];
+
+// Inizia la partita salvando formazione e primo possesso palla
+function confirmFormation() {
+    for (let p = 1; p <= 6; p++) {
+        let val = document.getElementById('input-p' + p).value;
+        if (!val) { 
+            alert("⚠️ Compila tutte le posizioni prima di iniziare!"); 
+            return; 
+        }
+        formation[p] = parseInt(val, 10);
+    }
+
+    const serviceRadio = document.querySelector('input[name="first-service"]:checked');
+    currentService = serviceRadio ? serviceRadio.value : 'home';
+
+    document.getElementById('setup-panel').style.display = 'none';
+    document.getElementById('scout-game-panel').style.display = 'block';
+    
+    updateCourtDisplay();
+    updateRallyDisplay();
+}
+
+// Aggiorna i numeri sul campo, evidenzia chi è in P1 e sposta l'icona del servizio (🏐)
+function updateCourtDisplay() {
+    for (let p = 1; p <= 6; p++) {
+        const btn = document.getElementById('court-p' + p);
+        document.getElementById('num-p' + p).innerText = formation[p];
+        btn.classList.remove('server-highlight');
+    }
+
+    if (currentService === 'home') {
+        document.getElementById('ball-home').classList.add('has-service');
+        document.getElementById('ball-away').classList.remove('has-service');
+        document.getElementById('court-p1').classList.add('server-highlight');
+    } else {
+        document.getElementById('ball-away').classList.add('has-service');
+        document.getElementById('ball-home').classList.remove('has-service');
+    }
+}
+
+// Esegue la rotazione reale in senso orario (P2 -> P1 -> P6 -> P5 -> P4 -> P3 -> P2)
+function rotateTeam() {
+    let t1 = formation[1];
+    let t2 = formation[2];
+    let t3 = formation[3];
+    let t4 = formation[4];
+    let t5 = formation[5];
+    let t6 = formation[6];
+
+    formation[1] = t2;
+    formation[6] = t1;
+    formation[5] = t6;
+    formation[4] = t5;
+    formation[3] = t4;
+    formation[2] = t3;
+}
+
+function selectCourtPosition(posNumber) {
+    document.querySelectorAll('.position-btn').forEach(btn => btn.classList.remove('selected'));
+    currentData.position = posNumber;
+    currentData.player = formation[posNumber];
+    document.getElementById('court-p' + posNumber).classList.add('selected');
+}
+
+function selectSkill(code, name) {
+    document.querySelectorAll('.btn-skill').forEach(btn => btn.classList.remove('selected'));
+    currentData.skillCode = code;
+    currentData.skillName = name;
+    document.getElementById('skill-' + code).classList.add('selected');
+
+    if (code === 'R') {
+        document.getElementById('vbtn-1').innerText = "## (Perfetta)";
+        document.getElementById('vbtn-2').innerText = "+ (Positiva)";
+        document.getElementById('vbtn-3').innerText = "! (Staccata)";
+        document.getElementById('vbtn-4').innerText = "- (Negativa)";
+        document.getElementById('vbtn-5').innerText = "= (Errore Loro)";
+    } else if (code === 'A') {
+        document.getElementById('vbtn-1').innerText = "# (Punto Noi)";
+        document.getElementById('vbtn-2').innerText = "+ (Positivo)";
+        document.getElementById('vbtn-3').innerText = "! (Difeso)";
+        document.getElementById('vbtn-4').innerText = "- (Contrattacco)";
+        document.getElementById('vbtn-5').innerText = "= (Errore Fuori)";
+    } else {
+        document.getElementById('vbtn-1').innerText = "#";
+        document.getElementById('vbtn-2').innerText = "+";
+        document.getElementById('vbtn-3').innerText = "!";
+        document.getElementById('vbtn-4').innerText = "-";
+        document.getElementById('vbtn-5').innerText = "=";
+    }
+}
+
+function pressVote(voteSymbol) {
+    if (!currentData.position || !currentData.skillCode) {
+        alert("⚠️ Seleziona prima il Giocatore sul campo e il Fondamentale!");
+        return;
+    }
+
+    let isTerminalAction = false;
+    let pointTo = null;
+
+    if (currentData.skillCode === 'R') {
+        if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
+    } else if (currentData.skillCode === 'A') {
+        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
+        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
+    } else if (currentData.skillCode === 'S') {
+        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
+        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
+    } else if (currentData.skillCode === 'B') {
+        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
+        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
+    }
+
+    let rotationHappened = false;
+
+    if (isTerminalAction && pointTo) {
+        scores[pointTo]++;
+
+        if (pointTo === 'home' && currentService === 'away') {
+            rotateTeam();
+            rotationHappened = true;
+        }
+        
+        currentService = pointTo;
+
+        let targetPoints = (currentSet === 5) ? 15 : 25;
+        if (scores[pointTo] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
+            alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (pointTo === 'home' ? 'NOI' : 'AVVERSARI'));
+            sets[pointTo]++;
+            scores.home = 0;
+            scores.away = 0;
+            currentSet++;
+        }
+    }
+
+    let voteText = voteSymbol;
+    if (currentData.skillCode === 'R' && voteSymbol === '#') voteText = "## Perfetta";
+    if (currentData.skillCode === 'A' && voteSymbol === '#') voteText = "# Vincente";
+    if (voteSymbol === '=') voteText = "= Errore";
+
+    const actionRecord = {
+        RallyID: "R_" + rallyCounter,
+        Orario: new Date().toLocaleTimeString(),
+        Set: currentSet,
+        PunteggioNoi: scores.home,
+        PunteggioLoro: scores.away,
+        ServizioA: currentService === 'home' ? 'Noi' : 'Loro',
+        RotazioneEseguita: rotationHappened ? 'SI' : 'NO',
+        Giocatore: currentData.player,
+        Posizione: 'P' + currentData.position,
+        Fondamentale: currentData.skillName,
+        Voto: voteSymbol,
+        DettaglioVoto: voteText
+    };
+
+    matchHistory.push(actionRecord);
+    updateLog();
+
+    if (isTerminalAction) {
+        rallyCounter++;
+    }
+
+    document.getElementById('score-home').innerText = scores.home;
+    document.getElementById('score-away').innerText = scores.away;
+    document.getElementById('sets-home').innerText = sets.home;
+    document.getElementById('sets-away').innerText = sets.away;
+    document.getElementById('current-set-display').innerText = currentSet;
+    
+    updateCourtDisplay();
+    updateRallyDisplay();
+
+    document.querySelectorAll('.position-btn, .btn-skill').forEach(btn => btn.classList.remove('selected'));
+    currentData = { player: null, position: null, skillCode: null, skillName: null };
+}
+
+function updateRallyDisplay() {
+    document.getElementById('rally-id-display').innerText = "RALLY: #" + rallyCounter;
+}
+
+function updateLog() {
+    const logList = document.getElementById('log-list');
+    if (matchHistory.length === 0) {
+        logList.innerHTML = "Nessuna azione registrata.";
+        return;
+    }
+    logList.innerHTML = matchHistory.map((act) => {
+        let rotString = act.RotazioneEseguita === 'SI' ? ' [🔄 Ruotato]' : '';
+        return "[" + act.RallyID + " | " + act.PunteggioNoi + ":" + act.PunteggioLoro + "] " + act.Posizione + " (N°" + act.Giocatore + ") " + act.Fondamentale + " -> " + act.DettaglioVoto + rotString;
+    }).reverse().join('<br>');
+}
+
+function exportCSV() {
+    if (matchHistory.length === 0) {
+        alert("Nessun dato da esportare!");
+        return;
+    }
+    const headers = ["RallyID", "Orario", "Set", "PunteggioNoi", "PunteggioLoro", "ServizioA", "RotazioneEseguita", "Giocatore", "Posizione", "Fondamentale", "Voto"];
+    const csvRows = [headers.join(",")];
+    
+    matchHistory.forEach(row => {
+        const values = headers.map(header => row[header]);
+        csvRows.push(values.join(","));
+    });
+    
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "scout_partita_gatevolley.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+</body>
+</html>
