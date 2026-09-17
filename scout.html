@@ -57,22 +57,22 @@
         </div>
     </div>
 
-    <!-- 2. SELEZIONE NUMERO GIOCATORE (Esempio maglie più comuni, personalizzabili) -->
+    <!-- 2. SELEZIONE NUMERO GIOCATORE -->
     <div class="player-selector">
         <strong>Seleziona Giocatore (N° Maglia):</strong>
         <div class="player-grid">
-            <button class="player-btn" onclick="selectPlayer(1)">1</button>
-            <button class="player-btn" onclick="selectPlayer(2)">2</button>
-            <button class="player-btn" onclick="selectPlayer(3)">3</button>
-            <button class="player-btn" onclick="selectPlayer(4)">4</button>
-            <button class="player-btn" onclick="selectPlayer(5)">5</button>
-            <button class="player-btn" onclick="selectPlayer(7)">7</button>
-            <button class="player-btn" onclick="selectPlayer(8)">8</button>
-            <button class="player-btn" onclick="selectPlayer(9)">9</button>
-            <button class="player-btn" onclick="selectPlayer(10)">10</button>
-            <button class="player-btn" onclick="selectPlayer(11)">11</button>
-            <button class="player-btn" onclick="selectPlayer(13)">13</button>
-            <button class="player-btn" onclick="selectPlayer(18)">18</button>
+            <button class="player-btn" id="player-1" onclick="selectPlayer(1)">1</button>
+            <button class="player-btn" id="player-2" onclick="selectPlayer(2)">2</button>
+            <button class="player-btn" id="player-3" onclick="selectPlayer(3)">3</button>
+            <button class="player-btn" id="player-4" onclick="selectPlayer(4)">4</button>
+            <button class="player-btn" id="player-5" onclick="selectPlayer(5)">5</button>
+            <button class="player-btn" id="player-7" onclick="selectPlayer(7)">7</button>
+            <button class="player-btn" id="player-8" onclick="selectPlayer(8)">8</button>
+            <button class="player-btn" id="player-9" onclick="selectPlayer(9)">9</button>
+            <button class="player-btn" id="player-10" onclick="selectPlayer(10)">10</button>
+            <button class="player-btn" id="player-11" onclick="selectPlayer(11)">11</button>
+            <button class="player-btn" id="player-13" onclick="selectPlayer(13)">13</button>
+            <button class="player-btn" id="player-18" onclick="selectPlayer(18)">18</button>
         </div>
     </div>
 
@@ -94,7 +94,7 @@
         <button class="btn-skill" id="skill-B" onclick="selectSkill('B', 'Muro')">Muro</button>
     </div>
 
-    <!-- 5. PANNELLO ESITO (Assegna anche il punto nel tabellone) -->
+    <!-- 5. PANNELLO ESITO -->
     <div class="panel">
         <button class="btn-effect btn-plus" onclick="registerAction('#', 'home')">🟢 PUNTO NOI (+)</button>
         <button class="btn-effect btn-minus" onclick="registerAction('=', 'away')">🔴 PUNTO LORO (=)</button>
@@ -118,7 +118,7 @@
     function selectPlayer(num) {
         document.querySelectorAll('.player-btn').forEach(btn => btn.classList.remove('selected'));
         currentData.player = num;
-        event.target.classList.add('selected');
+        document.getElementById(`player-${num}`).classList.add('selected');
     }
 
     function selectZone(zoneNumber) {
@@ -134,35 +134,33 @@
         document.getElementById(`skill-${code}`).classList.add('selected');
     }
 
-    // Registra l'azione e gestisce il punteggio automatico
     function registerAction(effect, pointTo) {
         if (!currentData.player || !currentData.zone || !currentData.skillCode) {
             alert("⚠️ Seleziona: 1.Giocatore, 2.Zona, 3.Fondamentale prima di chiudere l'azione!");
             return;
         }
 
-        // 1. Aggiorna il punteggio live
+        // Incrementa il punteggio
         scores[pointTo]++;
         
-        // 2. Controllo fine Set (25 punti con scarto di 2, o 15 al quinto set)
+        // Controllo fine Set (25 punti o 15 al quinto set, con scarto di 2)
         let targetPoints = (currentSet === 5) ? 15 : 25;
         if (scores[pointTo] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
             alert(`🎉 Fine Set ${currentSet}! Vinto da: ${pointTo === 'home' ? 'NOI' : 'AVVERSARI'}`);
             sets[pointTo]++;
-            // Resetta punteggi per il nuovo set
             scores.home = 0;
             scores.away = 0;
             currentSet++;
         }
 
-        // Aggiorna la grafica del tabellone
+        // Aggiorna l'interfaccia grafica
         document.getElementById('score-home').innerText = scores.home;
         document.getElementById('score-away').innerText = scores.away;
         document.getElementById('sets-home').innerText = sets.home;
         document.getElementById('sets-away').innerText = sets.away;
         document.getElementById('current-set-display').innerText = `#${currentSet}`;
 
-        // 3. Salva l'azione nello storico
+        // Salva nello storico
         const actionRecord = {
             Orario: new Date().toLocaleTimeString(),
             Set: currentSet,
@@ -179,7 +177,7 @@
         matchHistory.push(actionRecord);
         updateLog();
 
-        // Resetta la selezione per l'azione successiva (mantiene liberi i tasti)
+        // Resetta la selezione visiva
         document.querySelectorAll('.player-btn, .zone-btn, .btn-skill').forEach(btn => btn.classList.remove('selected'));
         currentData = { player: null, zone: null, skillCode: null, skillName: null };
     }
@@ -198,3 +196,6 @@
 
     function exportCSV() {
         if (matchHistory.length === 0) {
+            alert("Nessun dato da esportare!");
+            return;
+        }
