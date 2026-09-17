@@ -19,7 +19,7 @@
         .start-btn { background: #2e7d32; color: white; border: none; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; }
         .radio-group { margin: 10px 0; padding: 10px; background: white; border-radius: 4px; border: 1px solid #cfd8dc; }
 
-        /* Struttura base del Tabellone con il gradiente GateVolley inline */
+        /* Struttura base del Tabellone */
         .scoreboard { 
             display: flex; 
             justify-content: space-around; 
@@ -176,7 +176,6 @@ let matchHistory = [];
 
 // Inizia la partita salvando anagrafica gara, formazione e primo possesso palla
 function confirmFormation() {
-    // 1. Recupera i dati della partita e delle squadre
     const inputMatch = document.getElementById('input-match-id').value.trim();
     const inputHome = document.getElementById('input-team-home').value.trim();
     const inputAway = document.getElementById('input-team-away').value.trim();
@@ -185,7 +184,6 @@ function confirmFormation() {
     if (inputHome) teamNameHome = inputHome;
     if (inputAway) teamNameAway = inputAway;
 
-    // 2. Recupera la formazione dei 6 giocatori
     for (let p = 1; p <= 6; p++) {
         let val = document.getElementById('input-p' + p).value;
         if (!val) { 
@@ -195,16 +193,13 @@ function confirmFormation() {
         formation[p] = parseInt(val, 10);
     }
 
-    // 3. Imposta chi batte per primo
     const serviceRadio = document.querySelector('input[name="first-service"]:checked');
     currentService = serviceRadio ? serviceRadio.value : 'home';
 
-    // 4. Aggiorna le etichette di testo visibili a schermo sul tabellone
     document.getElementById('display-match-id').innerText = matchID;
     document.getElementById('display-name-home').innerText = teamNameHome;
     document.getElementById('display-name-away').innerText = teamNameAway;
 
-    // 5. Cambia schermata
     document.getElementById('setup-panel').style.display = 'none';
     document.getElementById('scout-game-panel').style.display = 'block';
     
@@ -240,11 +235,11 @@ function rotateTeam() {
     let t6 = formation[6];
 
     formation[1] = t2;
-    formation[6] = t1;
-    formation[5] = t6;
-    formation[4] = t5;
-    formation[3] = t4;
     formation[2] = t3;
+    formation[3] = t4;
+    formation[4] = t5;
+    formation[5] = t6;
+    formation[6] = t1;
 }
 
 function selectCourtPosition(posNumber) {
@@ -280,7 +275,6 @@ function selectSkill(code, name) {
         document.getElementById('vbtn-5').innerText = "=";
     }
 }
-
 function pressVote(voteSymbol) {
     if (!currentData.position || !currentData.skillCode) {
         alert("⚠️ Seleziona prima il Giocatore sul campo e il Fondamentale!");
@@ -330,7 +324,7 @@ function pressVote(voteSymbol) {
     if (currentData.skillCode === 'A' && voteSymbol === '#') voteText = "# Vincente";
     if (voteSymbol === '=') voteText = "= Errore";
 
-    // AGGIORNATO: Ogni record include stabilmente ID_Partita, ID_Set e i nomi corretti delle squadre
+    // Registra ogni record con ID_Partita, ID_Set e i nomi corretti delle squadre
     const actionRecord = {
         ID_Partita: matchID,
         ID_Set: "SET_" + currentSet,
@@ -383,7 +377,6 @@ function updateLog() {
     }).reverse().join('<br>');
 }
 
-// AGGIORNATO: Esportazione modificata per includere le colonne anagrafiche in cima al file Excel
 function exportCSV() {
     if (matchHistory.length === 0) {
         alert("Nessun dato da esportare!");
@@ -402,6 +395,10 @@ function exportCSV() {
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "scout_" + matchID + ".csv");
-	document.body.appendChild(link);link.click();
-	document.body.removeChild(link);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
+</script>
+</body>
+</html>
