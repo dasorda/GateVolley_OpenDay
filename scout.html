@@ -17,25 +17,27 @@
         .start-btn { background: #2e7d32; color: white; border: none; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; }
         .radio-group { margin: 10px 0; padding: 10px; background: white; border-radius: 4px; border: 1px solid #cfd8dc; }
 
-        /* Tabellone con lo sfondo originale GateVolley (Gradiente + Grid Pattern) */
+        /* AGGIORNATO: Tabellone con il gradiente arcobaleno ufficiale fedele all'header originale */
         .scoreboard { 
             display: flex; 
             justify-content: space-around; 
             align-items: center; 
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: #fff; 
-            padding: 15px; 
-            border-radius: 6px; 
+            background: linear-gradient(90deg, #e11d48 0%, #ea580c 20%, #eab308 40%, #16a34a 60%, #2563eb 100%) !important;
+            color: #ffffff !important; 
+            padding: 18px 15px; 
+            border-radius: 8px; 
             margin-bottom: 15px; 
-            border-bottom: 3px solid #3b82f6;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         .team-box { flex: 1; text-align: center; padding: 5px; position: relative; }
-        .team-score { font-size: 2.5rem; font-weight: bold; color: #ffeb3b; margin-top: 5px; }
-        .ball-indicator { font-size: 1.2rem; visibility: hidden; display: inline-block; margin-left: 5px; vertical-align: middle; }
+        
+        /* Forzato il bianco sui testi per garantire la massima leggibilità sopra l'arcobaleno */
+        .team-box div { color: #ffffff !important; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.6); }
+        .team-score { font-size: 2.8rem; font-weight: 900; color: #ffffff !important; margin-top: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); }
+        
+        .ball-indicator { font-size: 1.3rem; visibility: hidden; display: inline-block; margin-left: 5px; vertical-align: middle; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5)); }
         .has-service { visibility: visible !important; animation: pulse 1.5s infinite; }
-        .rally-id-display { font-size: 0.8rem; color: #81c784; font-family: monospace; }
+        .rally-id-display { font-size: 0.85rem; color: #ffffff !important; font-family: monospace; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); }
 
         /* Campo da Gioco Posizionale */
         .volleyball-court { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #ff9800; padding: 12px; border: 3px solid #1e88e5; border-radius: 4px; margin-bottom: 15px; aspect-ratio: 4 / 3; }
@@ -95,21 +97,23 @@
 
     <!-- PANNELLO DI GIOCO -->
     <div id="scout-game-panel" style="display: none;">
+        
+        <!-- Tabellone con il gradiente GateVolley Arcobaleno -->
         <div class="scoreboard">
             <div class="team-box">
-                <div>NOI <span id="ball-home" class="ball-indicator">🏐</span></div>
+                <div style="font-size: 1.1rem;">NOI <span id="ball-home" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-home">0</div>
-                <div style="font-size:0.8rem; color:#cbd5e1;">Set vinti: <span id="sets-home">0</span></div>
+                <div style="font-size: 0.8rem;">Set vinti: <span id="sets-home">0</span></div>
             </div>
-            <div style="padding: 0 10px;">
-                <div style="font-size: 1.1rem; font-weight: 800; letter-spacing: 1px; color: #3b82f6;">GateVolley</div>
-                <div style="font-size: 0.75rem; color: #94a3b8; font-weight: bold; margin-top: 2px;">SET <span id="current-set-display">1</span></div>
+            <div style="padding: 0 10px; min-width: 120px;">
+                <div style="font-size: 1.3rem; font-weight: 900; letter-spacing: 1px; color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">GateVolley</div>
+                <div style="font-size: 0.8rem; color: #ffffff !important; font-weight: bold; margin-top: 3px; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">SET <span id="current-set-display">1</span></div>
                 <div class="rally-id-display" id="rally-id-display" style="margin-top: 4px;">RALLY: #1</div>
             </div>
             <div class="team-box">
-                <div>AVVERSARI <span id="ball-away" class="ball-indicator">🏐</span></div>
+                <div style="font-size: 1.1rem;">AVVERSARI <span id="ball-away" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-away">0</div>
-                <div style="font-size:0.8rem; color:#cbd5e1;">Set vinti: <span id="sets-away">0</span></div>
+                <div style="font-size: 0.8rem;">Set vinti: <span id="sets-away">0</span></div>
             </div>
         </div>
 
