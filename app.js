@@ -280,24 +280,39 @@ function selectSkill(code, name) {
     currentData.skillName = name;
     document.getElementById('skill-' + code).classList.add('selected');
 
+    // Solo il simbolo nel bottone (per non allargare la riga oltre lo schermo);
+    // il significato completo resta disponibile come tooltip (title) al tocco prolungato/hover.
+    let labels;
     if (code === 'R') {
-        document.getElementById('vbtn-1').innerText = "## (Perfetta)";
-        document.getElementById('vbtn-2').innerText = "+ (Positiva)";
-        document.getElementById('vbtn-3').innerText = "! (Staccata)";
-        document.getElementById('vbtn-4').innerText = "- (Negativa)";
-        document.getElementById('vbtn-5').innerText = "= (Errore Loro)";
+        labels = [
+            { symbol: '##', title: 'Perfetta' },
+            { symbol: '+',  title: 'Positiva' },
+            { symbol: '!',  title: 'Staccata' },
+            { symbol: '-',  title: 'Negativa' },
+            { symbol: '=',  title: 'Errore Loro' }
+        ];
     } else if (code === 'A') {
-        document.getElementById('vbtn-1').innerText = "# (Punto Noi)";
-        document.getElementById('vbtn-2').innerText = "+ (Positivo)";
-        document.getElementById('vbtn-3').innerText = "! (Difeso)";
-        document.getElementById('vbtn-4').innerText = "- (Contrattacco)";
-        document.getElementById('vbtn-5').innerText = "= (Errore Fuori)";
+        labels = [
+            { symbol: '#', title: 'Punto Noi' },
+            { symbol: '+', title: 'Positivo' },
+            { symbol: '!', title: 'Difeso' },
+            { symbol: '-', title: 'Contrattacco' },
+            { symbol: '=', title: 'Errore Fuori' }
+        ];
     } else {
-        document.getElementById('vbtn-1').innerText = "#";
-        document.getElementById('vbtn-2').innerText = "+";
-        document.getElementById('vbtn-3').innerText = "!";
-        document.getElementById('vbtn-4').innerText = "-";
-        document.getElementById('vbtn-5').innerText = "=";
+        labels = [
+            { symbol: '#', title: 'Vincente' },
+            { symbol: '+', title: 'Positivo' },
+            { symbol: '!', title: 'Impreciso' },
+            { symbol: '-', title: 'Negativo' },
+            { symbol: '=', title: 'Errore' }
+        ];
+    }
+
+    for (let i = 0; i < 5; i++) {
+        const btn = document.getElementById('vbtn-' + (i + 1));
+        btn.innerText = labels[i].symbol;
+        btn.title = labels[i].title;
     }
 }
 

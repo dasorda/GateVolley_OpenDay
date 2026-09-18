@@ -67,7 +67,7 @@ body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding
 
 /* Tastiera dei Voti Dinamici */
 .vote-keyboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 15px 0; }
-.vote-btn { padding: 15px 5px; font-size: 1.1rem; font-weight: bold; border: 2px solid #78909c; border-radius: 6px; cursor: pointer; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+.vote-btn { padding: 15px 5px; font-size: 1.5rem; font-weight: bold; border: 2px solid #78909c; border-radius: 6px; cursor: pointer; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
 .v-double-plus { background: #1b5e20; }
 .v-plus { background: #4caf50; }
 .v-excl { background: #ff9800; }
@@ -83,23 +83,27 @@ body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding
 .log-area { max-height: 140px; overflow-y: auto; text-align: left; background: #eee; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; margin-bottom: 10px; line-height: 1.4; }
 .export-btn { background: #1565c0; color: white; width: 100%; padding: 12px; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; font-weight: bold; }
 
-/* Riga unica con 3 bottoni quadrati a icona: Esporta / Undo / Nuova Partita */
-.action-icons-row { display: flex; gap: 12px; margin-top: 10px; justify-content: center; }
+/* Riga unica con 3 bottoni tondi a icona: Esporta / Undo / Nuova Partita.
+   Stesso "family style" dei tasti E/P/+ in alto, ma a colore pieno perché qui
+   siamo su sfondo bianco e non sul gradiente del tabellone. */
+.action-icons-row { display: flex; gap: 14px; margin-top: 10px; justify-content: center; }
 .icon-action-btn {
     flex: 0 0 auto;
-    width: 48px;
-    height: 48px;
-    border: none;
-    border-radius: 10px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.5);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25);
     transition: transform 0.1s ease, opacity 0.2s ease;
 }
-.icon-action-btn svg { width: 22px; height: 22px; stroke: currentColor; }
+.icon-action-btn:active { transform: scale(0.92); }
+.icon-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.icon-action-btn svg { width: 18px; height: 18px; stroke: currentColor; }
 .icon-action-btn:active { transform: scale(0.93); }
 .icon-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .icon-export { background: #1565c0; }
