@@ -83,4 +83,26 @@ body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding
 .log-area { max-height: 140px; overflow-y: auto; text-align: left; background: #eee; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; margin-bottom: 10px; line-height: 1.4; }
 .export-btn { background: #1565c0; color: white; width: 100%; padding: 12px; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; font-weight: bold; }
 
+/* Riga unica con 3 bottoni quadrati a icona: Esporta / Undo / Nuova Partita */
+.action-icons-row { display: flex; gap: 10px; margin-top: 10px; }
+.icon-action-btn {
+    flex: 1;
+    aspect-ratio: 1 / 1;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    transition: transform 0.1s ease, opacity 0.2s ease;
+}
+.icon-action-btn:active { transform: scale(0.93); }
+.icon-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.icon-export { background: #1565c0; }
+.icon-undo { background: #f39c12; }
+.icon-new { background: #c0392b; }
+
 @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }

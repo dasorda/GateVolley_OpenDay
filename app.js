@@ -39,9 +39,7 @@ function capturePreviousState() {
         matchHistory: JSON.parse(JSON.stringify(matchHistory)),
         gamePanelVisible: document.getElementById('scout-game-panel').style.display === 'block'
     };
-    const undoBtn = document.getElementById('undo-btn');
-    undoBtn.removeAttribute('disabled');
-    undoBtn.style.opacity = '1';
+    document.getElementById('undo-btn').removeAttribute('disabled');
 }
 
 /**
@@ -81,9 +79,7 @@ function undoLastAction() {
     currentData = { player: null, position: null, skillCode: null, skillName: null };
 
     previousState = null;
-    const undoBtn = document.getElementById('undo-btn');
-    undoBtn.setAttribute('disabled', 'true');
-    undoBtn.style.opacity = '0.5';
+    document.getElementById('undo-btn').setAttribute('disabled', 'true');
 
     saveStateToLocalStorage();
     console.log("Azione annullata con successo.");

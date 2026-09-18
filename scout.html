@@ -117,12 +117,12 @@
         </div>
 
         <div class="log-area" id="log-list">Nessuna azione registrata.</div>
-        <button class="export-btn" onclick="exportCSV()">📥 Esporta Report CSV (Excel)</button>
-        
-        <!-- NUOVI PULSANTI UNDO E NUOVA PARTITA -->
-        <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
-            <button id="undo-btn" class="export-btn" onclick="undoLastAction()" style="background-color: #f39c12; opacity: 0.5;" disabled>↩️ Annulla Ultima Azione</button>
-            <button id="new-match-btn" class="export-btn" onclick="startNewMatch()" style="background-color: #c0392b;">🗑️ Inizia Nuova Partita</button>
+
+        <!-- RIGA UNICA DI AZIONI: EXPORT / UNDO / NUOVA PARTITA -->
+        <div class="action-icons-row">
+            <button class="icon-action-btn icon-export" onclick="exportCSV()" title="Esporta Report CSV (Excel)" aria-label="Esporta Report CSV">📥</button>
+            <button id="undo-btn" class="icon-action-btn icon-undo" onclick="undoLastAction()" title="Annulla Ultima Azione" aria-label="Annulla Ultima Azione" disabled>↩️</button>
+            <button id="new-match-btn" class="icon-action-btn icon-new" onclick="startNewMatch()" title="Inizia Nuova Partita" aria-label="Inizia Nuova Partita">🆕</button>
         </div>
     </div>
 </div>
