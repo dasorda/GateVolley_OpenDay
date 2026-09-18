@@ -4,96 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GateVolley Scout Progressivo</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 10px; margin: 0; }
-        .scout-container { max-width: 600px; margin: 0 auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
-        /* Configurazione Iniziale e Cambio Set */
-        .setup-screen, .modal-set-panel { background: #eceff1; padding: 20px; border-radius: 6px; margin-bottom: 15px; border: 2px dashed #b0bec5; }
-        .setup-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .setup-row input { flex: 1; padding: 8px; border: 1px solid #cfd8dc; border-radius: 4px; font-size: 1rem; }
-        .setup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; aspect-ratio: 4 / 3; }
-        .setup-input-box { background: white; border: 1px solid #90a4ae; border-radius: 4px; display: flex; flex-direction: column; padding: 8px; justify-content: center; }
-        .setup-input-box label { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #37474f; }
-        .setup-input-box input { width: 80%; margin: 0 auto; padding: 6px; text-align: center; font-size: 1.1rem; font-weight: bold; border: 1px solid #cfd8dc; border-radius: 4px; }
-        .start-btn { background: #2e7d32; color: white; border: none; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; }
-        .radio-group { margin: 10px 0; padding: 10px; background: white; border-radius: 4px; border: 1px solid #cfd8dc; }
-
-        /* Struttura base del Tabellone */
-        .scoreboard { 
-            display: flex; 
-            justify-content: space-around; 
-            align-items: center; 
-            padding: 18px 15px; 
-            border-radius: 8px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .team-box { flex: 1; text-align: center; padding: 5px; position: relative; }
-        .team-box div { color: #ffffff !important; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-        .team-score { font-size: 2.8rem; font-weight: 900; color: #ffffff !important; margin: 2px 0; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); }
-        
-        /* Contenitore e bottoni sintetici (E, P, +) sotto i punteggi */
-        .score-actions-row { display: flex; justify-content: center; gap: 6px; margin-top: 5px; }
-        .score-action-btn { 
-            background: rgba(255, 255, 255, 0.2); 
-            border: 1px solid rgba(255, 255, 255, 0.5); 
-            color: white !important; 
-            font-size: 0.9rem; 
-            font-weight: 800; 
-            width: 32px;
-            height: 32px;
-            line-height: 30px;
-            border-radius: 50%; 
-            cursor: pointer; 
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            padding: 0;
-            text-align: center;
-            display: inline-block;
-        }
-        .score-action-btn:active { background: rgba(255, 255, 255, 0.4); }
-        
-        .ball-indicator { font-size: 1.3rem; visibility: hidden; display: inline-block; margin-left: 5px; vertical-align: middle; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.6)); }
-        .has-service { visibility: visible !important; animation: pulse 1.5s infinite; }
-        .rally-id-display { font-size: 0.85rem; color: #ffffff !important; font-family: monospace; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
-
-        /* Campo da Gioco Posizionale */
-        .volleyball-court { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #ff9800; padding: 12px; border: 3px solid #1e88e5; border-radius: 4px; margin-bottom: 15px; aspect-ratio: 4 / 3; }
-        .position-btn { background: rgba(255, 255, 255, 0.95); border: 2px solid #37474f; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; min-height: 60px; position: relative; }
-        .position-label { font-size: 0.8rem; color: #546e7a; font-weight: bold; }
-        .player-number-display { font-size: 1.6rem; font-weight: bold; color: #1e88e5; }
-        .server-highlight { border: 3px dashed #1b5e20 !important; background: #e8f5e9 !important; }
-        
-        /* Sezioni Pulsanti */
-        .panel { margin: 10px 0; display: flex; justify-content: space-around; gap: 5px; }
-        .panel button { flex: 1; padding: 12px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-weight: bold;}
-        .btn-skill { background: #e0e0e0; }
-        
-        /* Tastiera dei Voti Dinamici */
-        .vote-keyboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 15px 0; }
-        .vote-btn { padding: 15px 5px; font-size: 1.1rem; font-weight: bold; border: 2px solid #78909c; border-radius: 6px; cursor: pointer; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-        .v-double-plus { background: #1b5e20; } 
-        .v-plus { background: #4caf50; }        
-        .v-excl { background: #ff9800; }        
-        .v-minus { background: #e53935; }       
-        .v-error { background: #b71c1c; }       
-
-        /* Stati Selezionati */
-        .selected { background: #1e88e5 !important; color: white !important; }
-        .selected .position-label { color: #bbdefb !important; }
-        .selected .player-number-display { color: white !important; }
-        
-        /* Storico */
-        .log-area { max-height: 140px; overflow-y: auto; text-align: left; background: #eee; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; margin-bottom: 10px; line-height: 1.4; }
-        .export-btn { background: #1565c0; color: white; width: 100%; padding: 12px; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; font-weight: bold; }
-        
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-    </style>
+    <!-- Collegamento al tuo foglio di stile esterno -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="scout-container">
 
-    <!-- 1. SCHERMATA SETUP INIZIALE (SET 1) -->
+    <!-- 1. SCHERMATA SETUP INIZIALE (SET 1) - ORIGINALE -->
     <div id="setup-panel" class="setup-screen">
         <h3>📋 Configurazione Gara e Formazione</h3>
         
@@ -123,7 +40,7 @@
         <button class="start-btn" onclick="confirmFormation()">✅ Inizia Partita</button>
     </div>
 
-    <!-- 2. PANNELLO INTERMEDIO NUOVO SET -->
+    <!-- 2. PANNELLO INTERMEDIO NUOVO SET - ORIGINALE -->
     <div id="next-set-panel" class="modal-set-panel" style="display: none;">
         <h3 id="next-set-title">🔄 Configurazione Set 2</h3>
         <p style="font-size: 0.9rem; margin: 0 0 10px 0; color: #37474f;">Conferma o modifica la formazione per il prossimo set:</p>
@@ -145,14 +62,13 @@
         <button class="start-btn" style="background: #1565c0;" onclick="startNextSet()">🏐 Conferma e Inizia Set</button>
     </div>
 
-    <!-- 3. INTERFACCIA DI GIOCO PRINCIPALE -->
+    <!-- 3. INTERFACCIA DI GIOCO PRINCIPALE - ORIGINALE -->
     <div id="scout-game-panel" style="display: none;">
         <div class="scoreboard" style="background: linear-gradient(90deg, #e11d48 0%, #ea580c 20%, #eab308 40%, #16a34a 60%, #2563eb 100%) !important;">
             <div class="team-box">
                 <div style="font-size: 1.1rem;"><span id="display-name-home">NOI</span> <span id="ball-home" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-home">0</div>
                 <div style="font-size: 0.8rem;">Set vinti: <span id="sets-home">0</span></div>
-                <!-- AGGIORNATO: Bottoni sintetici compatti per Noi -->
                 <div class="score-actions-row">
                     <button class="score-action-btn" title="Errore Avversario (Regalo)" onclick="addDirectPoint('home', 'ERRORE_AVVERSARIO', 'E')">E</button>
                     <button class="score-action-btn" title="Incremento Manuale" onclick="addDirectPoint('home', 'PUNTO_MANUALE', '+')">+</button>
@@ -167,7 +83,6 @@
                 <div style="font-size: 1.1rem;"><span id="display-name-away">AVVERSARI</span> <span id="ball-away" class="ball-indicator">🏐</span></div>
                 <div class="team-score" id="score-away">0</div>
                 <div style="font-size: 0.8rem;">Set vinti: <span id="sets-away">0</span></div>
-                <!-- AGGIORNATO: Bottoni sintetici compatti per gli Avversari -->
                 <div class="score-actions-row">
                     <button class="score-action-btn" title="Punto Avversario (Giocata)" onclick="addDirectPoint('away', 'PUNTO_AVVERSARIO', 'P')">P</button>
                     <button class="score-action-btn" title="Errore Nostro Generico" onclick="addDirectPoint('away', 'ERRORE_GENERICO_NOI', 'E')">E</button>
@@ -203,357 +118,17 @@
 
         <div class="log-area" id="log-list">Nessuna azione registrata.</div>
         <button class="export-btn" onclick="exportCSV()">📥 Esporta Report CSV (Excel)</button>
+        
+        <!-- NUOVI PULSANTI UNDO E NUOVA PARTITA -->
+        <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+            <button id="undo-btn" class="export-btn" onclick="undoLastAction()" style="background-color: #f39c12; opacity: 0.5;" disabled>↩️ Annulla Ultima Azione</button>
+            <button id="new-match-btn" class="export-btn" onclick="startNewMatch()" style="background-color: #c0392b;">🗑️ Inizia Nuova Partita</button>
+        </div>
     </div>
 </div>
-<script>
-// Configurazione iniziale e stati stabili
-let formation = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
-let scores = { home: 0, away: 0 };
-let sets = { home: 0, away: 0 };
-let currentSet = 1;
 
-// Dati anagrafici del match inseriti dall'utente
-let matchID = "GARA_01";
-let teamNameHome = "GateVolley";
-let teamNameAway = "AVVERSARI";
+<!-- Collegamento al tuo file JavaScript esterno -->
+<script src="app.js"></script>
 
-// Gestione dei Rally e del Possesso Servizio ('home' o 'away')
-let rallyCounter = 1;
-let currentService = 'home'; 
-
-// Stato dell'azione corrente
-let currentData = { player: null, position: null, skillCode: null, skillName: null };
-let matchHistory = [];
-
-// Inizia la partita (Set 1) salvando anagrafica gara, formazione e primo possesso palla
-function confirmFormation() {
-    const inputMatch = document.getElementById('input-match-id').value.trim();
-    const inputHome = document.getElementById('input-team-home').value.trim();
-    const inputAway = document.getElementById('input-team-away').value.trim();
-
-    if (inputMatch) matchID = inputMatch;
-    if (inputHome) teamNameHome = inputHome;
-    if (inputAway) teamNameAway = inputAway;
-
-    for (let p = 1; p <= 6; p++) {
-        let val = document.getElementById('input-p' + p).value;
-        if (!val) { 
-            alert("⚠️ Compila tutte le posizioni dei giocatori prima di iniziare!"); 
-            return; 
-        }
-        formation[p] = parseInt(val, 10);
-    }
-
-    const serviceRadio = document.querySelector('input[name="first-service"]:checked');
-    currentService = serviceRadio ? serviceRadio.value : 'home';
-
-    document.getElementById('display-match-id').innerText = matchID;
-    document.getElementById('display-name-home').innerText = teamNameHome;
-    document.getElementById('display-name-away').innerText = teamNameAway;
-
-    document.getElementById('setup-panel').style.display = 'none';
-    document.getElementById('scout-game-panel').style.display = 'block';
-    
-    updateCourtDisplay();
-    updateRallyDisplay();
-}
-
-// Gestisce l'apertura del pannello del nuovo set precompilando i dati esistenti
-function openNextSetPanel() {
-    document.getElementById('scout-game-panel').style.display = 'none';
-    document.getElementById('next-set-title').innerText = "🔄 Configurazione Set " + currentSet;
-    
-    for (let p = 1; p <= 6; p++) {
-        document.getElementById('next-p' + p).value = formation[p];
-    }
-    
-    document.getElementById('next-set-panel').style.display = 'block';
-}
-
-// Avvia effettivamente il nuovo set dopo la conferma del sestetto
-function startNextSet() {
-    for (let p = 1; p <= 6; p++) {
-        let val = document.getElementById('next-p' + p).value;
-        if (!val) { 
-            alert("⚠️ Compila tutte le posizioni prima di ripartire!"); 
-            return; 
-        }
-        formation[p] = parseInt(val, 10);
-    }
-
-    const serviceRadio = document.querySelector('input[name="next-service"]:checked');
-    currentService = serviceRadio ? serviceRadio.value : 'home';
-
-    document.getElementById('next-set-panel').style.display = 'none';
-    document.getElementById('scout-game-panel').style.display = 'block';
-    
-    updateCourtDisplay();
-    updateRallyDisplay();
-}
-
-function updateCourtDisplay() {
-    for (let p = 1; p <= 6; p++) {
-        const btn = document.getElementById('court-p' + p);
-        document.getElementById('num-p' + p).innerText = formation[p];
-        btn.classList.remove('server-highlight');
-    }
-
-    if (currentService === 'home') {
-        document.getElementById('ball-home').classList.add('has-service');
-        document.getElementById('ball-away').classList.remove('has-service');
-        document.getElementById('court-p1').classList.add('server-highlight');
-    } else {
-        document.getElementById('ball-away').classList.add('has-service');
-        document.getElementById('ball-home').classList.remove('has-service');
-    }
-}
-
-function rotateTeam() {
-    let t1 = formation[1];
-    let t2 = formation[2];
-    let t3 = formation[3];
-    let t4 = formation[4];
-    let t5 = formation[5];
-    let t6 = formation[6];
-
-    formation[1] = t2;
-    formation[2] = t3;
-    formation[3] = t4;
-    formation[4] = t5;
-    formation[5] = t6;
-    formation[6] = t1;
-}
-
-function selectCourtPosition(posNumber) {
-    document.querySelectorAll('.position-btn').forEach(btn => btn.classList.remove('selected'));
-    currentData.position = posNumber;
-    currentData.player = formation[posNumber];
-    document.getElementById('court-p' + posNumber).classList.add('selected');
-}
-
-function selectSkill(code, name) {
-    document.querySelectorAll('.btn-skill').forEach(btn => btn.classList.remove('selected'));
-    currentData.skillCode = code;
-    currentData.skillName = name;
-    document.getElementById('skill-' + code).classList.add('selected');
-
-    if (code === 'R') {
-        document.getElementById('vbtn-1').innerText = "## (Perfetta)";
-        document.getElementById('vbtn-2').innerText = "+ (Positiva)";
-        document.getElementById('vbtn-3').innerText = "! (Staccata)";
-        document.getElementById('vbtn-4').innerText = "- (Negativa)";
-        document.getElementById('vbtn-5').innerText = "= (Errore Loro)";
-    } else if (code === 'A') {
-        document.getElementById('vbtn-1').innerText = "# (Punto Noi)";
-        document.getElementById('vbtn-2').innerText = "+ (Positivo)";
-        document.getElementById('vbtn-3').innerText = "! (Difeso)";
-        document.getElementById('vbtn-4').innerText = "- (Contrattacco)";
-        document.getElementById('vbtn-5').innerText = "= (Errore Fuori)";
-    } else {
-        document.getElementById('vbtn-1').innerText = "#";
-        document.getElementById('vbtn-2').innerText = "+";
-        document.getElementById('vbtn-3').innerText = "!";
-        document.getElementById('vbtn-4').innerText = "-";
-        document.getElementById('vbtn-5').innerText = "=";
-    }
-}
-function pressVote(voteSymbol) {
-    if (!currentData.position || !currentData.skillCode) {
-        alert("⚠️ Seleziona prima il Giocatore sul campo e il Fondamentale!");
-        return;
-    }
-
-    let isTerminalAction = false;
-    let pointTo = null;
-
-    if (currentData.skillCode === 'R') {
-        if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
-    } else if (currentData.skillCode === 'A') {
-        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
-        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
-    } else if (currentData.skillCode === 'S') {
-        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
-        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
-    } else if (currentData.skillCode === 'B') {
-        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
-        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
-    }
-
-    let rotationHappened = false;
-    let setFinished = false;
-
-    if (isTerminalAction && pointTo) {
-        scores[pointTo]++;
-
-        if (pointTo === 'home' && currentService === 'away') {
-            rotateTeam();
-            rotationHappened = true;
-        }
-        
-        currentService = pointTo;
-
-        let targetPoints = (currentSet === 5) ? 15 : 25;
-        if (scores[pointTo] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
-            alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (pointTo === 'home' ? teamNameHome : teamNameAway));
-            sets[pointTo]++;
-            currentSet++;
-            scores.home = 0;
-            scores.away = 0;
-            setFinished = true;
-        }
-    }
-
-    let voteText = voteSymbol;
-    if (currentData.skillCode === 'R' && voteSymbol === '#') voteText = "## Perfetta";
-    if (currentData.skillCode === 'A' && voteSymbol === '#') voteText = "# Vincente";
-    if (voteSymbol === '=') voteText = "= Errore";
-
-    const actionRecord = {
-        ID_Partita: matchID,
-        ID_Set: "SET_" + (setFinished ? (currentSet - 1) : currentSet),
-        RallyID: "R_" + rallyCounter,
-        Orario: new Date().toLocaleTimeString(),
-        PunteggioNoi: scores.home,
-        PunteggioLoro: scores.away,
-        ServizioA: currentService === 'home' ? teamNameHome : teamNameAway,
-        RotazioneEseguita: rotationHappened ? 'SI' : 'NO',
-        Giocatore: currentData.player,
-        Posizione: 'P' + currentData.position,
-        Fondamentale: currentData.skillName,
-        Voto: voteSymbol,
-        DettaglioVoto: voteText
-    };
-
-    matchHistory.push(actionRecord);
-    updateLog();
-
-    if (isTerminalAction) {
-        rallyCounter++;
-    }
-
-    document.getElementById('score-home').innerText = scores.home;
-    document.getElementById('score-away').innerText = scores.away;
-    document.getElementById('sets-home').innerText = sets.home;
-    document.getElementById('sets-away').innerText = sets.away;
-    document.getElementById('current-set-display').innerText = currentSet;
-    
-    if (setFinished) {
-        openNextSetPanel();
-    } else {
-        updateCourtDisplay();
-        updateRallyDisplay();
-    }
-
-    document.querySelectorAll('.position-btn, .btn-skill').forEach(btn => btn.classList.remove('selected'));
-    currentData = { player: null, position: null, skillCode: null, skillName: null };
-}
-
-// NUOVA FUNZIONE: Gestisce l'assegnazione dei 4 casi veloci (E, P, +) dal tabellone
-function addDirectPoint(team, pointType, codeSymbol) {
-    // 1. Assegna il punto alla squadra corretta
-    scores[team]++;
-    
-    let rotationHappened = false;
-    let setFinished = false;
-
-    // Se il punto va a Noi e servivano loro, esegue il Cambio Palla e RUOTA la squadra
-    if (team === 'home' && currentService === 'away' && pointType !== 'PUNTO_MANUALE') {
-        rotateTeam();
-        rotationHappened = true;
-    }
-    
-    // Il possesso palla si sposta solo se non è un riallineamento manuale neutro
-    if (pointType !== 'PUNTO_MANUALE') {
-        currentService = team;
-    }
-
-    // Controllo fine Set
-    let targetPoints = (currentSet === 5) ? 15 : 25;
-    if (scores[team] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
-        alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (team === 'home' ? teamNameHome : teamNameAway));
-        sets[team]++;
-        currentSet++;
-        scores.home = 0;
-        scores.away = 0;
-        setFinished = true;
-    }
-
-    // 2. Crea il record per il database (Giocatore = 0, Posizione = N/D per non inquinare)
-    const actionRecord = {
-        ID_Partita: matchID,
-        ID_Set: "SET_" + (setFinished ? (currentSet - 1) : currentSet),
-        RallyID: "R_" + rallyCounter,
-        Orario: new Date().toLocaleTimeString(),
-        PunteggioNoi: scores.home,
-        PunteggioLoro: scores.away,
-        ServizioA: currentService === 'home' ? teamNameHome : teamNameAway,
-        RotazioneEseguita: rotationHappened ? 'SI' : 'NO',
-        Giocatore: 0,
-        Posizione: "N/D",
-        Fondamentale: pointType,
-        Voto: codeSymbol,
-        DettaglioVoto: codeSymbol + " (" + pointType + ")"
-    };
-
-    matchHistory.push(actionRecord);
-    updateLog();
-
-    // Chiude lo scambio incrementando il RallyID
-    rallyCounter++;
-
-    // 3. Rinfresca l'interfaccia visiva
-    document.getElementById('score-home').innerText = scores.home;
-    document.getElementById('score-away').innerText = scores.away;
-    document.getElementById('sets-home').innerText = sets.home;
-    document.getElementById('sets-away').innerText = sets.away;
-    document.getElementById('current-set-display').innerText = currentSet;
-    
-    if (setFinished) {
-        openNextSetPanel();
-    } else {
-        updateCourtDisplay();
-        updateRallyDisplay();
-    }
-}
-
-function updateRallyDisplay() {
-    document.getElementById('rally-id-display').innerText = "RALLY: #" + rallyCounter;
-}
-
-function updateLog() {
-    const logList = document.getElementById('log-list');
-    if (matchHistory.length === 0) {
-        logList.innerHTML = "Nessuna azione registrata.";
-        return;
-    }
-    logList.innerHTML = matchHistory.map((act) => {
-        let rotString = act.RotazioneEseguita === 'SI' ? ' [🔄 Ruotato]' : '';
-        return "[" + act.RallyID + " | " + act.PunteggioNoi + ":" + act.PunteggioLoro + "] " + act.Posizione + " (N°" + act.Giocatore + ") " + act.Fondamentale + " -> " + act.DettaglioVoto + rotString;
-    }).reverse().join('<br>');
-}
-
-function exportCSV() {
-    if (matchHistory.length === 0) {
-        alert("Nessun dato da esportare!");
-        return;
-    }
-    const headers = ["ID_Partita", "ID_Set", "RallyID", "Orario", "PunteggioNoi", "PunteggioLoro", "ServizioA", "RotazioneEseguita", "Giocatore", "Posizione", "Fondamentale", "Voto"];
-    const csvRows = [headers.join(",")];
-    
-    matchHistory.forEach(row => {
-        const values = headers.map(header => row[header]);
-        csvRows.push(values.join(","));
-    });
-    
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "scout_" + matchID + ".csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-</script>
 </body>
 </html>
