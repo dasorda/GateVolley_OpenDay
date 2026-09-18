@@ -1,244 +1,324 @@
 /* ==========================================================================
-   STILE GENERALE E LAYOUT
+   STILE GRAFICO ORIGINALE - GATEVOLLEY SCOUT
    ========================================================================== */
-:root {
-    --primary-color: #2c3e50;
-    --accent-color: #3498db;
-    --success-color: #2ecc71;
-    --warning-color: #f1c40f;
-    --danger-color: #e74c3c;
-    --court-color: #e67e22;
-    --court-lines: #ffffff;
-    --light-bg: #ecf0f1;
-}
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    user-select: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    user-select: none; /* Previene selezioni accidentali durante lo scout rapido */
 }
 
 body {
-    background-color: var(--light-bg);
-    color: var(--primary-color);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    background-color: #f5f6fa;
+    color: #2c3e50;
     padding: 10px;
 }
 
-/* Intestazione */
-.app-header {
-    background-color: var(--primary-color);
-    color: white;
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #ffffff;
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+h2, h3 {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
-.setup-panel {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.setup-panel input {
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    text-align: center;
-}
-
-.vs-label {
+label {
+    display: block;
     font-weight: bold;
-    color: var(--warning-color);
+    margin-bottom: 5px;
+    font-size: 14px;
 }
 
-/* Tabellone Punteggi */
-.scoreboard-section {
-    background-color: white;
-    padding: 15px;
-    border-radius: 8px;
+input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
     margin-bottom: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+/* Griglia per l'inserimento dei numeri di formazione */
+.formation-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.formation-grid div {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.formation-grid label {
+    font-size: 11px;
+    margin-bottom: 3px;
+}
+
+.formation-grid input {
+    margin-bottom: 0;
+    text-align: center;
+}
+
+/* Pulsanti Generici */
+.btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background 0.2s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Pannello del Gioco Live */
+.header-match {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    background: #2c3e50;
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+/* Tabellone dei Punteggi */
 .scoreboard {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #ecf0f1;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
 }
 
-.score-card {
+.score-box {
     flex: 1;
     text-align: center;
 }
 
-.score-value {
+.team-name {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.score-num {
     font-size: 48px;
     font-weight: bold;
-    margin: 10px 0;
+    color: #2c3e50;
     font-family: monospace;
 }
 
-.score-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+.set-counter {
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-top: 5px;
 }
 
-.score-buttons button {
-    padding: 8px 15px;
-    font-size: 16px;
+.score-vs {
+    font-size: 24px;
     font-weight: bold;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--light-bg);
-    cursor: pointer;
+    color: #bdc3c7;
+    padding: 0 10px;
 }
 
-.match-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.info-badge {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 5px 15px;
-    border-radius: 15px;
+.rally-info {
+    text-align: center;
     font-weight: bold;
+    color: #2980b9;
+    margin-bottom: 15px;
 }
 
-.service-indicator {
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--accent-color);
-}
-
-.system-controls {
-    display: flex;
-    gap: 5px;
-}
-
-/* Grafica del Campo da Pallavolo */
-.court-container {
-    display: flex;
-    justify-content: center;
-    margin: 10px 0;
-}
-
-.volleyball-court {
-    background-color: var(--court-color);
-    border: 5px solid var(--court-lines);
-    width: 100%;
-    max-width: 500px;
-    aspect-ratio: 9 / 9; /* Campo quadrato di metà campo per lo scouting della nostra metà */
+/* Campo da Gioco Grafico (Metà Campo della Squadra) */
+.court {
+    background-color: #d35400; /* Colore arancione campo */
+    border: 4px solid #ffffff;
+    border-radius: 8px;
+    aspect-ratio: 9 / 9; /* Layout quadrato */
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 4px;
     padding: 4px;
-    border-radius: 4px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.court-zone {
-    background-color: rgba(255, 255, 255, 0.15);
-    border: 2px dashed rgba(255,255,255,0.5);
+.position-btn {
+    border: 2px dashed rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 4px;
-    transition: background-color 0.1s ease;
+    padding: 10px;
+    transition: background 0.1s;
 }
 
-.court-zone:active {
-    background-color: rgba(255, 255, 255, 0.4);
+.position-btn:active {
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
-.court-zone span {
-    font-size: 18px;
+.position-btn.selected {
+    background-color: #f1c40f !important;
+    border: 2px solid #ffffff !important;
+    color: #2c3e50 !important;
+}
+
+/* Assegnazione delle posizioni grafiche nella griglia */
+.pos-4 { grid-column: 1; grid-row: 1; }
+.pos-3 { grid-column: 2; grid-row: 1; }
+.pos-2 { grid-column: 3; grid-row: 1; }
+.pos-5 { grid-column: 1; grid-row: 2; }
+.pos-6 { grid-column: 2; grid-row: 2; }
+.pos-1 { grid-column: 3; grid-row: 2; }
+
+.pos-label {
+    font-size: 12px;
     opacity: 0.7;
+    margin-bottom: 5px;
 }
 
-.player-name {
-    margin-top: 5px;
-    font-size: 14px;
-    background-color: rgba(0,0,0,0.5);
-    padding: 2px 6px;
-    border-radius: 10px;
+.player-num {
+    font-size: 28px;
+    font-weight: 900;
 }
 
-/* Pulsanti dei Fondamentali e dei Voti */
-.action-panel {
-    background-color: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-
-.panel-row {
-    margin-bottom: 12px;
-}
-
-.panel-row h4 {
-    margin-bottom: 6px;
-}
-
-.button-group {
+/* Pulsanti Diretti (E / P) */
+.direct-points {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
-.button-group button {
+.direct-btn {
     flex: 1;
-    min-width: 80px;
-    padding: 12px 6px;
-    font-size: 14px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
     border: none;
     border-radius: 6px;
-    background-color: var(--light-bg);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-err { background-color: #e67e22; } /* Errore avversario -> Punto Noi */
+.btn-pt  { background-color: #95a5a6; } /* Punto avversario -> Punto Loro */
+
+.direct-btn:active { transform: scale(0.98); }
+
+.section-title {
     font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #7f8c8d;
+}
+
+/* Griglia dei Fondamentali */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.btn-skill {
+    padding: 12px 5px;
+    font-size: 14px;
+    font-weight: bold;
+    background: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
     cursor: pointer;
 }
 
-/* Classi Pulsanti Speciali */
-.btn-primary { background-color: var(--accent-color); color: white; }
-.btn-success { background-color: var(--success-color); color: white; }
-.btn-danger { background-color: var(--danger-color); color: white; }
-.btn-undo { background-color: var(--warning-color); color: white; }
-
-.vote-err { background-color: #ffcccc !important; color: #cc0000; }
-.vote-neg { background-color: #ffe5cc !important; color: #cc6600; }
-.vote-neu { background-color: #fffae6 !important; color: #997a00; }
-.vote-pos { background-color: #e6f9ff !important; color: #007799; }
-.vote-perf { background-color: #e6ffe6 !important; color: #009900; }
-
-.app-footer {
-    margin-top: auto;
-    text-align: center;
-    padding-top: 10px;
+.btn-skill.selected {
+    background: #2980b9;
+    color: white;
+    border-color: #2980b9;
 }
 
-.app-footer button {
-    width: 100%;
-    padding: 15px;
-    font-size: 18px;
+/* Riga dei Voti di Valutazione */
+.votes-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.vote-btn {
+    flex: 1;
+    padding: 15px 5px;
+    font-size: 20px;
     font-weight: bold;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
+
+.vote-btn:active { transform: scale(0.95); }
+
+/* Colori specifici dei voti */
+.v-err   { background-color: #ffcccc; color: #c0392b; }
+.v-minus { background-color: #ffe5cc; color: #d35400; }
+.v-slash { background-color: #fff9db; color: #f39c12; }
+.v-plus  { background-color: #e3faf2; color: #2ecc71; }
+.v-hash  { background-color: #e8f4fd; color: #2980b9; }
+
+/* Log Cronologia Live */
+.log-container {
+    background: #f8f9fa;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px;
+    max-height: 120px;
+    overflow-y: auto;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.log-item {
+    padding: 4px 0;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.log-item:last-child {
+    border-bottom: none;
+}
+
+/* Pulsanti Gestione Esportazione / Undo / Reset */
+.export-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #34495e;
+    
