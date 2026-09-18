@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GateVolley Scout - Live Statistics</title>
+    <!-- Collegamento al file CSS esterno per lo stile -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Intestazione e Configurazione Iniziale -->
+    <header class="app-header">
+        <h1>🏐 GateVolley Scout</h1>
+        <div class="setup-panel" id="setup-panel">
+            <input type="text" id="team-noi" placeholder="Nome Nostra Squadra" value="Noi">
+            <span class="vs-label">VS</span>
+            <input type="text" id="team-loro" placeholder="Avversari" value="Loro">
+            <button onclick="startMatchSession()" class="btn-primary">Inizia Partita</button>
+        </div>
+    </header>
+
+    <!-- Tabellone Punteggio e Controlli Rapidi -->
+    <section class="scoreboard-section">
+        <div class="scoreboard">
+            <div class="score-card team-home">
+                <h2 id="display-team-noi">Noi</h2>
+                <div class="score-value" id="val-score-noi">0</div>
+                <div class="score-buttons">
+                    <button onclick="changeScore('noi', 1)">+1</button>
+                    <button onclick="changeScore('noi', -1)">-1</button>
+                </div>
+            </div>
+
+            <div class="match-info">
+                <div class="info-badge">Set <span id="display-current-set">1</span></div>
+                <div class="service-indicator" id="service-indicator">Servizio: -</div>
+                
+                <!-- Pulsanti di Controllo: UNDO e NUOVA PARTITA -->
+                <div class="system-controls">
+                    <button id="btn-undo" onclick="undoLastAction()" disabled class="btn-undo">↩️ Undo</button>
+                    <button id="btn-new" onclick="startNewMatch()" class="btn-danger">🗑️ Reset</button>
+                </div>
+            </div>
+
+            <div class="score-card team-away">
+                <h2 id="display-team-loro">Loro</h2>
+                <div class="score-value" id="val-score-loro">0</div>
+                <div class="score-buttons">
+                    <button onclick="changeScore('loro', 1)">+1</button>
+                    <button onclick="changeScore('loro', -1)">-1</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Il Campo da Gioco per lo Scouting Posizionale -->
+    <main class="court-container">
+        <div class="volleyball-court" id="court">
+            <!-- Le 6 posizioni standard della pallavolo sul campo -->
+            <div class="court-zone zone-4" onclick="selectZone(4)"><span>P4</span><div class="player-name" id="p-4">Giocatore 4</div></div>
+            <div class="court-zone zone-3" onclick="selectZone(3)"><span>P3</span><div class="player-name" id="p-3">Giocatore 3</div></div>
+            <div class="court-zone zone-2" onclick="selectZone(2)"><span>P2</span><div class="player-name" id="p-2">Giocatore 2</div></div>
+            <div class="court-zone zone-5" onclick="selectZone(5)"><span>P5</span><div class="player-name" id="p-5">Giocatore 5</div></div>
+            <div class="court-zone zone-6" onclick="selectZone(6)"><span>P6</span><div class="player-name" id="p-6">Giocatore 6</div></div>
+            <div class="court-zone zone-1" onclick="selectZone(1)"><span>P1</span><div class="player-name" id="p-1">Giocatore 1</div></div>
+        </div>
+    </main>
+
+    <!-- Pannello di Selezione Fondamentale e Voto -->
+    <section class="action-panel" id="action-panel" style="display: none;">
+        <h3 id="action-panel-title">Registra Azione per Giocatore</h3>
+        
+        <div class="panel-row">
+            <h4>Fondamentale:</h4>
+            <div class="button-group" id="group-fundamentals">
+                <button onclick="setFundamental('Battuta')">Battuta</button>
+                <button onclick="setFundamental('Ricezione')">Ricezione</button>
+                <button onclick="setFundamental('Alzata')">Alzata</button>
+                <button onclick="setFundamental('Attacco')">Attacco</button>
+                <button onclick="setFundamental('Muro')">Muro</button>
+                <button onclick="setFundamental('Difesa')">Difesa</button>
+            </div>
+        </div>
+
+        <div class="panel-row">
+            <h4>Valutazione (Voto):</h4>
+            <div class="button-group" id="group-evaluations">
+                <button class="vote-err" onclick="setVote('=')">Error (=)</button>
+                <button class="vote-neg" onclick="setVote('-')">Negativo (-)</button>
+                <button class="vote-neu" onclick="setVote('!')">Neutro (!)</button>
+                <button class="vote-pos" onclick="setVote('+')">Positivo (+)</button>
+                <button class="vote-perf" onclick="setVote('#')">Perfetto (#)</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Barra di Esportazione CSV in fondo alla pagina -->
+    <footer class="app-footer">
+        <button onclick="exportToCSV()" class="btn-success">📥 Esporta Statistiche (CSV)</button>
+    </footer>
+
+    <!-- Collegamento alla logica JavaScript esterna -->
+    <script src="app.js"></script>
+</body>
+</html>

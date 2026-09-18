@@ -1,0 +1,244 @@
+/* ==========================================================================
+   STILE GENERALE E LAYOUT
+   ========================================================================== */
+:root {
+    --primary-color: #2c3e50;
+    --accent-color: #3498db;
+    --success-color: #2ecc71;
+    --warning-color: #f1c40f;
+    --danger-color: #e74c3c;
+    --court-color: #e67e22;
+    --court-lines: #ffffff;
+    --light-bg: #ecf0f1;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+}
+
+body {
+    background-color: var(--light-bg);
+    color: var(--primary-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 10px;
+}
+
+/* Intestazione */
+.app-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.setup-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.setup-panel input {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.vs-label {
+    font-weight: bold;
+    color: var(--warning-color);
+}
+
+/* Tabellone Punteggi */
+.scoreboard-section {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.score-card {
+    flex: 1;
+    text-align: center;
+}
+
+.score-value {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 10px 0;
+    font-family: monospace;
+}
+
+.score-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.score-buttons button {
+    padding: 8px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--light-bg);
+    cursor: pointer;
+}
+
+.match-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-badge {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+}
+
+.service-indicator {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.system-controls {
+    display: flex;
+    gap: 5px;
+}
+
+/* Grafica del Campo da Pallavolo */
+.court-container {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.volleyball-court {
+    background-color: var(--court-color);
+    border: 5px solid var(--court-lines);
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 9 / 9; /* Campo quadrato di metà campo per lo scouting della nostra metà */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 4px;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.court-zone {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px dashed rgba(255,255,255,0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: background-color 0.1s ease;
+}
+
+.court-zone:active {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.court-zone span {
+    font-size: 18px;
+    opacity: 0.7;
+}
+
+.player-name {
+    margin-top: 5px;
+    font-size: 14px;
+    background-color: rgba(0,0,0,0.5);
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+/* Pulsanti dei Fondamentali e dei Voti */
+.action-panel {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.panel-row {
+    margin-bottom: 12px;
+}
+
+.panel-row h4 {
+    margin-bottom: 6px;
+}
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.button-group button {
+    flex: 1;
+    min-width: 80px;
+    padding: 12px 6px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--light-bg);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Classi Pulsanti Speciali */
+.btn-primary { background-color: var(--accent-color); color: white; }
+.btn-success { background-color: var(--success-color); color: white; }
+.btn-danger { background-color: var(--danger-color); color: white; }
+.btn-undo { background-color: var(--warning-color); color: white; }
+
+.vote-err { background-color: #ffcccc !important; color: #cc0000; }
+.vote-neg { background-color: #ffe5cc !important; color: #cc6600; }
+.vote-neu { background-color: #fffae6 !important; color: #997a00; }
+.vote-pos { background-color: #e6f9ff !important; color: #007799; }
+.vote-perf { background-color: #e6ffe6 !important; color: #009900; }
+
+.app-footer {
+    margin-top: auto;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.app-footer button {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+}
