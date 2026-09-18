@@ -1,42 +1,59 @@
-// ==========================================
-// LOGICA DI GIOCO & MOTORE DI UNDO (ANNULLA)
-// ==========================================
+// ==========================================================================
+// GATEVOLLEY SCOUT - APP.JS (PARTE 1 DI 2)
+// LOGICA DI STATO, GESTIONE DEL SETUP, UNDO E AUTOSAVE
+// ==========================================================================
 
-// Chiave LocalStorage
-const LOCAL_STORAGE_KEY = 'gatevolley_scout_state';
+// Chiave utilizzata per salvare lo stato nel LocalStorage del browser
+const LOCAL_STORAGE_KEY = 'gatevolley_match_state_save';
 
-// Variabili di Stato Globali
-let scoreNoi = 0;
-let scoreLoro = 0;
+// VARIABILI DI GIOCO GLOBALI (STRUTTURA ORIGINALE PRESERVATA AL 100%)
+let matchID = "GARA_01";
+let teamNameHome = "Noi";
+let teamNameAway = "Loro";
+
+let scores = { home: 0, away: 0 };
+let sets = { home: 0, away: 0 };
 let currentSet = 1;
-let serviceOwner = "Noi"; // Chi serve per primo
-let currentRotation = ["Schiacciatore 1", "Centrale 1", "Opposto", "Schiacciatore 2", "Centrale 2", "Palleggiatore"]; // Posizioni da P1 a P6
-let actionsLog = []; // Archivio delle azioni registrate per il file CSV
 
-// Variabile per memorizzare lo stato precedente
+let rallyCounter = 1;
+let currentService = "home"; // 'home' o 'away'
+
+// Formazione: mappatura della posizione (chiave 1..6) al numero di maglia (valore)
+let formation = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
+
+// Record accumulati per l'esportazione in CSV
+let matchHistory = [];
+
+// Variabili per la gestione dell'azione selezionata correntemente
+let currentData = {
+    player: null,
+    position: null,
+    skillCode: null,
+    skillName: null
+};
+
+// STRUTTURA PER LA FUNZIONE "UNDO" (ANNULLA ULTIMA AZIONE)
 let previousState = null;
 
-// Variabile temporanea per l'azione corrente in fase di inserimento
-let activeAction = null;
-
 /**
- * Cattura e memorizza lo stato attuale prima di applicare qualsiasi modifica.
- * Questo permette di abilitare la funzione "Undo" (1 livello).
+ * Cattura lo stato corrente completo prima di qualsiasi modifica.
+ * Questa funzione rende possibile la funzione "Annulla Ultima Azione".
  */
-function savePreviousState() {
+function capturePreviousState() {
     previousState = {
-        scoreNoi: scoreNoi,
-        scoreLoro: scoreLoro,
+        scores: JSON.parse(JSON.stringify(scores)),
+        sets: JSON.parse(JSON.stringify(sets)),
         currentSet: currentSet,
-        serviceOwner: serviceOwner,
-        currentRotation: [...currentRotation],
-        actionsLog: JSON.parse(JSON.stringify(actionsLog))
+        rallyCounter: rallyCounter,
+        currentService: currentService,
+        formation: JSON.parse(JSON.stringify(formation)),
+        matchHistory: JSON.parse(JSON.stringify(matchHistory))
     };
     updateUndoButtonState();
 }
 
 /**
- * Ripristina l'applicazione allo stato catturato prima dell'ultima azione.
+ * Ripristina il sistema allo stato immediatamente precedente l'ultimo inserimento.
  */
 function undoLastAction() {
     if (!previousState) {
@@ -44,35 +61,45 @@ function undoLastAction() {
         return;
     }
 
-    // Ripristiniamo i valori di gioco dallo stato catturato
-    scoreNoi = previousState.scoreNoi;
-    scoreLoro = previousState.scoreLoro;
-    currentSet = previousState.currentSet;
-    serviceOwner = previousState.serviceOwner;
-    currentRotation = [...previousState.currentRotation];
-    actionsLog = JSON.parse(JSON.stringify(previousState.actionsLog));
+    // Ripristino delle variabili di gioco
+    scores = previousState.scores;
+    sets = previousState.sets;
+    currentSet = currentSet; // Manteniamo coerente il set
+    rallyCounter = previousState.rallyCounter;
+    currentService = previousState.currentService;
+    formation = previousState.formation;
+    matchHistory = JSON.parse(JSON.stringify(previousState.matchHistory));
 
     // Consumiamo lo stato precedente
     previousState = null;
 
-    // Nascondiamo l'eventuale pannello di inserimento se era aperto
-    document.getElementById('action-panel').style.display = 'none';
-    activeAction = null;
+    // Deselezioniamo eventuali tasti attivi
+    document.querySelectorAll('.position-btn, .btn-skill').forEach(btn => btn.classList.remove('selected'));
+    currentData = { player: null, position: null, skillCode: null, skillName: null };
 
-    // Aggiorniamo l'interfaccia e salviamo nel browser
-    updateScoreboardDisplay();
-    renderPlayersOnCourt();
+    // Aggiorniamo l'interfaccia utente
+    updateCourtDisplay();
+    updateLog();
+    updateRallyDisplay();
     updateUndoButtonState();
-    saveToLocalStorage();
 
-    console.log("Azione annullata con successo.");
+    // Aggiorniamo il tabellone
+    document.getElementById('score-home').innerText = scores.home;
+    document.getElementById('score-away').innerText = scores.away;
+    document.getElementById('sets-home').innerText = sets.home;
+    document.getElementById('sets-away').innerText = sets.away;
+    document.getElementById('current-set-display').innerText = currentSet;
+
+    // Salviamo il nuovo stato ripristinato nell'Autosave
+    saveStateToLocalStorage();
+    console.log("Ultima azione annullata con successo.");
 }
 
 /**
- * Aggiorna lo stato visivo (abilitato/disabilitato) del pulsante Undo
+ * Attiva o disattiva il pulsante Undo sul DOM
  */
 function updateUndoButtonState() {
-    const undoBtn = document.getElementById('btn-undo');
+    const undoBtn = document.getElementById('undo-btn');
     if (undoBtn) {
         if (previousState) {
             undoBtn.removeAttribute('disabled');
@@ -83,215 +110,434 @@ function updateUndoButtonState() {
         }
     }
 }
-// ==========================================
-// AUTOSAVE (LOCALSTORAGE), ROTAZIONI E CSV
-// ==========================================
 
 /**
- * Salva i dati correnti nel LocalStorage del browser.
+ * Salva i dati di gioco nel LocalStorage del browser.
  */
-function saveToLocalStorage() {
-    const stateToSave = {
-        scoreNoi: scoreNoi,
-        scoreLoro: scoreLoro,
-        currentSet: currentSet,
-        serviceOwner: serviceOwner,
-        currentRotation: currentRotation,
-        actionsLog: actionsLog
+function saveStateToLocalStorage() {
+    const gameState = {
+        matchID,
+        teamNameHome,
+        teamNameAway,
+        scores,
+        sets,
+        currentSet,
+        rallyCounter,
+        currentService,
+        formation,
+        matchHistory,
+        // Memorizza se l'utente era già all'interno del pannello di gioco
+        isGameStarted: document.getElementById('scout-game-panel').style.display === 'block'
     };
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
 }
 
 /**
- * Carica in automatico i dati salvati all'avvio dell'applicazione.
+ * Carica in automatico la sessione di gioco precedentemente salvata.
  */
-function loadFromLocalStorage() {
-    const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!savedData) return;
+function loadStateFromLocalStorage() {
+    const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!savedState) return;
 
     try {
-        const loadedState = JSON.parse(savedData);
-        scoreNoi = loadedState.scoreNoi;
-        scoreLoro = loadedState.scoreLoro;
-        currentSet = loadedState.currentSet;
-        serviceOwner = loadedState.serviceOwner;
-        currentRotation = loadedState.currentRotation;
-        actionsLog = loadedState.actionsLog;
+        const gameState = JSON.parse(savedState);
 
-        updateScoreboardDisplay();
-        renderPlayersOnCourt();
-        console.log("Stato di gioco ripristinato automaticamente dall'autosave.");
+        if (gameState.isGameStarted) {
+            matchID = gameState.matchID;
+            teamNameHome = gameState.teamNameHome;
+            teamNameAway = gameState.teamNameAway;
+            scores = gameState.scores;
+            sets = gameState.sets;
+            currentSet = gameState.currentSet;
+            rallyCounter = gameState.rallyCounter;
+            currentService = gameState.currentService;
+            formation = gameState.formation;
+            matchHistory = gameState.matchHistory;
+
+            // Ripristino Elementi DOM
+            document.getElementById('display-match-id').innerText = matchID;
+            document.getElementById('display-name-home').innerText = teamNameHome;
+            document.getElementById('display-name-away').innerText = teamNameAway;
+            document.getElementById('score-home').innerText = scores.home;
+            document.getElementById('score-away').innerText = scores.away;
+            document.getElementById('sets-home').innerText = sets.home;
+            document.getElementById('sets-away').innerText = sets.away;
+            document.getElementById('current-set-display').innerText = currentSet;
+
+            // Mostra la schermata di gioco
+            document.getElementById('setup-panel').style.display = 'none';
+            document.getElementById('scout-game-panel').style.display = 'block';
+
+            updateCourtDisplay();
+            updateLog();
+            updateRallyDisplay();
+            console.log("Sessione ripristinata con successo dall'autosave.");
+        }
     } catch (e) {
-        console.error("Impossibile caricare i dati di gioco salvati:", e);
+        console.error("Errore nel caricamento del match salvato:", e);
     }
 }
 
 /**
- * Resetta l'applicazione cancellando i dati in memoria per iniziare una nuova partita.
+ * Pulisce il LocalStorage e resetta l'applicazione per una nuova partita.
  */
 function startNewMatch() {
-    if (confirm("Attenzione: vuoi davvero cancellare i dati attuali e iniziare una nuova partita?")) {
+    if (confirm("Sei sicuro di voler iniziare una nuova partita? Tutti i dati correnti andranno persi.")) {
         localStorage.removeItem(LOCAL_STORAGE_KEY);
         window.location.reload();
     }
 }
+// ==========================================================================
+// GATEVOLLEY SCOUT - APP.JS (PARTE 2 DI 2)
+// GESTIONE CAMPO, ROTAZIONI, AZIONI DI GIOCO LIVE ED ESPORTAZIONE CSV
+// ==========================================================================
 
 /**
- * Modifica il punteggio e gestisce la logica di cambio palla / servizio / rotazione.
+ * Gestisce la configurazione iniziale e l'avvio del pannello di gioco.
  */
-function changeScore(team, offset) {
-    savePreviousState(); // Permette l'undo di questa modifica
+function confirmFormation() {
+    const inputMatch = document.getElementById('input-match-id').value.trim();
+    const inputHome = document.getElementById('input-team-home').value.trim();
+    const inputAway = document.getElementById('input-team-away').value.trim();
 
-    if (team === 'noi') {
-        scoreNoi = Math.max(0, scoreNoi + offset);
-        if (offset > 0 && serviceOwner !== "Noi") {
-            serviceOwner = "Noi";
-            rotateTeam(); // Rotazione automatica al cambio palla guadagnato
+    if (inputMatch) matchID = inputMatch;
+    if (inputHome) teamNameHome = inputHome;
+    if (inputAway) teamNameAway = inputAway;
+
+    // Recupera i numeri di maglia dei giocatori per le 6 posizioni
+    for (let p = 1; p <= 6; p++) {
+        let val = document.getElementById('input-p' + p).value;
+        if (!val) {
+            alert("⚠️ Compila tutte le posizioni dei giocatori prima di iniziare!");
+            return;
         }
-    } else {
-        scoreLoro = Math.max(0, scoreLoro + offset);
-        if (offset > 0 && serviceOwner !== "Loro") {
-            serviceOwner = "Loro";
-        }
+        formation[p] = parseInt(val, 10);
     }
 
-    updateScoreboardDisplay();
-    saveToLocalStorage();
+    const serviceRadio = document.querySelector('input[name="first-service"]:checked');
+    currentService = serviceRadio ? serviceRadio.value : 'home';
+
+    // Inserisce i nomi e dettagli nel DOM
+    document.getElementById('display-match-id').innerText = matchID;
+    document.getElementById('display-name-home').innerText = teamNameHome;
+    document.getElementById('display-name-away').innerText = teamNameAway;
+
+    // Passa alla schermata di gioco live
+    document.getElementById('setup-panel').style.display = 'none';
+    document.getElementById('scout-game-panel').style.display = 'block';
+
+    updateCourtDisplay();
+    updateRallyDisplay();
+    
+    // Salva lo stato iniziale del match
+    saveStateToLocalStorage();
 }
 
 /**
- * Ruota le posizioni dei giocatori in senso orario.
+ * Gestisce la selezione di un giocatore/posizione sul campo grafico.
  */
-function rotateTeam() {
-    // Rotazione standard pallavolo dell'array a 6 elementi (da P1 a P6)
-    const lastPlayer = currentRotation.pop();
-    currentRotation.unshift(lastPlayer);
-    renderPlayersOnCourt();
+function selectPosition(posNum) {
+    document.querySelectorAll('.position-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    const playerNum = formation[posNum];
+    currentData.player = playerNum;
+    currentData.position = posNum;
+
+    // Evidenzia visivamente il pulsante selezionato
+    const activeBtn = document.querySelector('.pos-' + posNum);
+    if (activeBtn) {
+        activeBtn.classList.add('selected');
+    }
 }
 
 /**
- * Ridisegna le informazioni sul tabellone
+ * Memorizza il fondamentale selezionato dall'utente.
  */
-function updateScoreboardDisplay() {
-    document.getElementById('val-score-noi').innerText = scoreNoi;
-    document.getElementById('val-score-loro').innerText = scoreLoro;
-    document.getElementById('display-current-set').innerText = currentSet;
-    document.getElementById('service-indicator').innerText = "Servizio: " + serviceOwner;
+function selectSkill(skillCode, skillName) {
+    document.querySelectorAll('.btn-skill').forEach(btn => btn.classList.remove('selected'));
+    
+    currentData.skillCode = skillCode;
+    currentData.skillName = skillName;
+
+    // Evidenzia il pulsante del fondamentale attivo
+    const event = window.event;
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('selected');
+    }
 }
 
 /**
- * Ridisegna i nomi dei giocatori sul campo grafico
+ * Registra i punti rapidi definiti dai tasti E (Errore Avversario) e P (Punto Avversario).
  */
-function renderPlayersOnCourt() {
-    document.getElementById('p-1').innerText = currentRotation[0];
-    document.getElementById('p-2').innerText = currentRotation[1];
-    document.getElementById('p-3').innerText = currentRotation[2];
-    document.getElementById('p-4').innerText = currentRotation[3];
-    document.getElementById('p-5').innerText = currentRotation[4];
-    document.getElementById('p-6').innerText = currentRotation[5];
-}
+function addDirectPoint(team, pointType, codeSymbol) {
+    // Cattura lo stato precedente per consentire l'Undo
+    capturePreviousState();
 
-/**
- * Gestisce la selezione di una zona del campo per avviare la compilazione di un'azione.
- */
-function selectZone(zone) {
-    savePreviousState(); // Salva lo stato prima di iniziare la nuova azione di scouting
+    // Incrementa il punteggio
+    scores[team]++;
 
-    // Determiniamo il giocatore in quella zona (l'indice corrisponde alla posizione)
-    // Le posizioni 1-6 corrispondono agli indici 0-5 dell'array di rotazione
-    const player = currentRotation[zone - 1];
+    let rotationHappened = false;
+    let setFinished = false;
 
-    activeAction = {
-        idPartita: "Match_" + new Date().toLocaleDateString().replace(/\//g, "-"),
-        idSet: currentSet,
-        rallyID: actionsLog.length + 1,
-        orario: new Date().toLocaleTimeString(),
-        punteggioNoi: scoreNoi,
-        punteggioLoro: scoreLoro,
-        servizioA: serviceOwner,
-        giocatore: player,
-        posizione: "P" + zone,
-        fondamentale: "",
-        voto: ""
+    // Se guadagniamo il punto noi ed era servizio loro, esegue rotazione automatica
+    if (team === 'home' && currentService === 'away' && pointType !== 'PUNTO_MANUALE') {
+        rotateTeam();
+        rotationHappened = true;
+    }
+
+    if (pointType !== 'PUNTO_MANUALE') {
+        currentService = team;
+    }
+
+    // Gestione della fine del set (25 punti o 15 al tie-break)
+    let targetPoints = (currentSet === 5) ? 15 : 25;
+    if (scores[team] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
+        alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (team === 'home' ? teamNameHome : teamNameAway));
+        sets[team]++;
+        currentSet++;
+        scores.home = 0;
+        scores.away = 0;
+        setFinished = true;
+    }
+
+    // Registra l'azione immediata nel log storico
+    const actionRecord = {
+        ID_Partita: matchID,
+        ID_Set: "SET_" + (setFinished ? (currentSet - 1) : currentSet),
+        RallyID: "R_" + rallyCounter,
+        Orario: new Date().toLocaleTimeString(),
+        PunteggioNoi: scores.home,
+        PunteggioLoro: scores.away,
+        ServizioA: currentService === 'home' ? teamNameHome : teamNameAway,
+        RotazioneEseguita: rotationHappened ? 'SI' : 'NO',
+        Giocatore: 0,
+        Posizione: "N/D",
+        Fondamentale: pointType,
+        Voto: codeSymbol,
+        DettaglioVoto: codeSymbol + " (" + pointType + ")"
     };
 
-    document.getElementById('action-panel-title').innerText = "Azione per: " + player + " (" + activeAction.posizione + ")";
-    document.getElementById('action-panel').style.display = 'block';
-}
+    matchHistory.push(actionRecord);
+    updateLog();
 
-function setFundamental(fundamental) {
-    if (!activeAction) return;
-    activeAction.fondamentale = fundamental;
-}
+    rallyCounter++;
 
-function setVote(vote) {
-    if (!activeAction || !activeAction.fondamentale) {
-        alert("Seleziona prima un fondamentale!");
-        return;
-    }
-    activeAction.voto = vote;
+    // Aggiorna l'interfaccia utente
+    document.getElementById('score-home').innerText = scores.home;
+    document.getElementById('score-away').innerText = scores.away;
+    document.getElementById('sets-home').innerText = sets.home;
+    document.getElementById('sets-away').innerText = sets.away;
+    document.getElementById('current-set-display').innerText = currentSet;
 
-    // Aggiungiamo l'azione al log principale
-    actionsLog.push(activeAction);
+    updateCourtDisplay();
+    updateRallyDisplay();
     
-    // Nascondiamo il pannello e puliamo l'azione temporanea
-    document.getElementById('action-panel').style.display = 'none';
-    activeAction = null;
-
-    // Aggiorniamo il database locale e l'UI
-    saveToLocalStorage();
-    updateUndoButtonState();
-    console.log("Azione salvata nel log.");
+    // Salva l'avanzamento nel browser
+    saveStateToLocalStorage();
 }
 
 /**
- * Esporta tutte le statistiche accumulate in un file CSV scaricabile.
+ * Registra il voto finale completando la tracciatura dell'azione sul giocatore.
  */
-function exportToCSV() {
-    if (actionsLog.length === 0) {
-        alert("Nessun dato da esportare!");
+function pressVote(voteSymbol) {
+    if (!currentData.position || !currentData.skillCode) {
+        alert("⚠️ Seleziona prima il Giocatore sul campo e il Fondamentale!");
         return;
     }
 
-    const headers = ["ID_Partita", "ID_Set", "RallyID", "Orario", "PunteggioNoi", "PunteggioLoro", "ServizioA", "Giocatore", "Posizione", "Fondamentale", "Voto"];
-    let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
+    // Cattura lo stato precedente per consentire l'Undo
+    capturePreviousState();
 
-    actionsLog.forEach(action => {
-        const row = [
-            action.idPartita,
-            action.idSet,
-            action.rallyID,
-            action.orario,
-            action.punteggioNoi,
-            action.punteggioLoro,
-            action.servizioA,
-            action.giocatore,
-            action.posizione,
-            action.fondamentale,
-            action.voto
+    let isTerminalAction = false;
+    let pointTo = null;
+
+    // Logica di assegnazione dei punti in base a Fondamentale e Voto
+    if (currentData.skillCode === 'R') {
+        if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
+    } else if (currentData.skillCode === 'A') {
+        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
+        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
+    } else if (currentData.skillCode === 'S') {
+        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
+        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
+    } else if (currentData.skillCode === 'B') {
+        if (voteSymbol === '#') { isTerminalAction = true; pointTo = 'home'; }
+        else if (voteSymbol === '=') { isTerminalAction = true; pointTo = 'away'; }
+    }
+
+    let rotationHappened = false;
+    let setFinished = false;
+
+    if (isTerminalAction && pointTo) {
+        scores[pointTo]++;
+
+        if (pointTo === 'home' && currentService === 'away') {
+            rotateTeam();
+            rotationHappened = true;
+        }
+        
+        currentService = pointTo;
+
+        let targetPoints = (currentSet === 5) ? 15 : 25;
+        if (scores[pointTo] >= targetPoints && Math.abs(scores.home - scores.away) >= 2) {
+            alert("🎉 Fine Set " + currentSet + "! Vinto da: " + (pointTo === 'home' ? teamNameHome : teamNameAway));
+            sets[pointTo]++;
+            currentSet++;
+            scores.home = 0;
+            scores.away = 0;
+            setFinished = true;
+        }
+    }
+
+    let voteText = voteSymbol;
+    if (currentData.skillCode === 'R' && voteSymbol === '#') voteText = "## Perfetta";
+    if (currentData.skillCode === 'A' && voteSymbol === '#') voteText = "# Vincente";
+    if (voteSymbol === '=') voteText = "= Errore";
+
+    // Salvataggio record dettagliato nel match history
+    const actionRecord = {
+        ID_Partita: matchID,
+        ID_Set: "SET_" + (setFinished ? (currentSet - 1) : currentSet),
+        RallyID: "R_" + rallyCounter,
+        Orario: new Date().toLocaleTimeString(),
+        PunteggioNoi: scores.home,
+        PunteggioLoro: scores.away,
+        ServizioA: currentService === 'home' ? teamNameHome : teamNameAway,
+        RotazioneEseguita: rotationHappened ? 'SI' : 'NO',
+        Giocatore: currentData.player,
+        Posizione: 'P' + currentData.position,
+        Fondamentale: currentData.skillName,
+        Voto: voteSymbol,
+        DettaglioVoto: voteText
+    };
+
+    matchHistory.push(actionRecord);
+    updateLog();
+
+    if (isTerminalAction) {
+        rallyCounter++;
+    }
+
+    // Aggiornamento DOM punteggi
+    document.getElementById('score-home').innerText = scores.home;
+    document.getElementById('score-away').innerText = scores.away;
+    document.getElementById('sets-home').innerText = sets.home;
+    document.getElementById('sets-away').innerText = sets.away;
+    document.getElementById('current-set-display').innerText = currentSet;
+    
+    updateCourtDisplay();
+    updateRallyDisplay();
+
+    // Rimuove la selezione dai pulsanti grafici
+    document.querySelectorAll('.position-btn, .btn-skill').forEach(btn => btn.classList.remove('selected'));
+    currentData = { player: null, position: null, skillCode: null, skillName: null };
+    
+    // Salva l'aggiornamento nel browser
+    saveStateToLocalStorage();
+}
+
+/**
+ * Esegue la rotazione standard di pallavolo: P1 -> P6 -> P5 -> P4 -> P3 -> P2 -> P1.
+ */
+function rotateTeam() {
+    let newFormation = { ...formation };
+    newFormation[6] = formation[1];
+    newFormation[5] = formation[6];
+    newFormation[4] = formation[5];
+    newFormation[3] = formation[4];
+    newFormation[2] = formation[3];
+    newFormation[1] = formation[2];
+    formation = newFormation;
+}
+
+/**
+ * Aggiorna i testi e i numeri visibili sul campo grafico.
+ */
+function updateCourtDisplay() {
+    for (let p = 1; p <= 6; p++) {
+        document.getElementById('court-p' + p).innerText = formation[p] || '-';
+    }
+}
+
+/**
+ * Visualizza le informazioni del Rally e del Servizio corrente.
+ */
+function updateRallyDisplay() {
+    const serviceName = currentService === 'home' ? teamNameHome : teamNameAway;
+    document.getElementById('rally-info-display').innerText = `Rally: R_${rallyCounter} | Servizio: ${serviceName}`;
+}
+
+/**
+ * Ridisegna l'elenco visivo della cronologia delle ultime azioni.
+ */
+function updateLog() {
+    const logContainer = document.getElementById('log-container');
+    if (!logContainer) return;
+
+    if (matchHistory.length === 0) {
+        logContainer.innerHTML = '<div style="color: #7f8c8d; font-style: italic;">Nessuna azione registrata.</div>';
+        return;
+    }
+
+    let html = '';
+    // Mostra la lista invertita per visualizzare l'ultima azione registrata in alto
+    for (let i = matchHistory.length - 1; i >= 0; i--) {
+        const item = matchHistory[i];
+        let detail = "";
+        if (item.Giocatore === 0) {
+            detail = `<strong>${item.Fondamentale}</strong> -> Punto a ${item.ServizioA}`;
+        } else {
+            detail = `P${item.Posizione.replace('P', '')} (N°${item.Giocatore}) - <strong>${item.Fondamentale}</strong>: ${item.DettaglioVoto}`;
+        }
+        html += `<div class="log-item">[${item.Orario}] ${detail} (${item.PunteggioNoi}-${item.PunteggioLoro})</div>`;
+    }
+    logContainer.innerHTML = html;
+}
+
+/**
+ * Esporta tutti i dati in formato CSV e avvia il download del file.
+ */
+function exportCSV() {
+    if (matchHistory.length === 0) {
+        alert("⚠️ Nessun dato presente da esportare!");
+        return;
+    }
+
+    const headers = ["ID_Partita", "ID_Set", "RallyID", "Orario", "PunteggioNoi", "PunteggioLoro", "ServizioA", "RotazioneEseguita", "Giocatore", "Posizione", "Fondamentale", "Voto", "DettaglioVoto"];
+    let csvRows = [headers.join(",")];
+
+    matchHistory.forEach(item => {
+        const values = [
+            `"${item.ID_Partita}"`,
+            `"${item.ID_Set}"`,
+            `"${item.RallyID}"`,
+            `"${item.Orario}"`,
+            item.PunteggioNoi,
+            item.PunteggioLoro,
+            `"${item.ServizioA}"`,
+            `"${item.RotazioneEseguita}"`,
+            item.Giocatore,
+            `"${item.Posizione}"`,
+            `"${item.Fondamentale}"`,
+            `"${item.Voto}"`,
+            `"${item.DettaglioVoto}"`
         ];
-        csvContent += row.join(",") + "\n";
+        csvRows.push(values.join(","));
     });
 
-    const encodedUri = encodeURI(csvContent);
+    const csvString = csvRows.join("\n");
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Scout_Set_${currentSet}_Export.csv`);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `scout_${matchID}_set_${currentSet}.csv`);
+    link.style.visibility = 'hidden';
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
 
-// Funzione di avvio sessione
-function startMatchSession() {
-    const noi = document.getElementById('team-noi').value;
-    const loro = document.getElementById('team-loro').value;
-    document.getElementById('display-team-noi').innerText = noi;
-    document.getElementById('display-team-loro').innerText = loro;
-    saveToLocalStorage();
-}
-
-// Inizializzazione automatica all'avvio della pagina
-window.onload = function() {
-    loadFromLocalStorage();
-};
+// Avvia automaticamente il caricamento dello stato precedente all'avvio della pagina
+window.addEventListener('load', loadStateFromLocalStorage);
