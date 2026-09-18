@@ -84,13 +84,13 @@ body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding
 .export-btn { background: #1565c0; color: white; width: 100%; padding: 12px; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; font-weight: bold; }
 
 /* Riga unica con 3 bottoni quadrati a icona: Esporta / Undo / Nuova Partita */
-.action-icons-row { display: flex; gap: 10px; margin-top: 10px; }
+.action-icons-row { display: flex; gap: 12px; margin-top: 10px; justify-content: center; }
 .icon-action-btn {
-    flex: 1;
-    aspect-ratio: 1 / 1;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
     border: none;
     border-radius: 10px;
-    font-size: 1.7rem;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -99,6 +99,7 @@ body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding
     box-shadow: 0 3px 6px rgba(0,0,0,0.2);
     transition: transform 0.1s ease, opacity 0.2s ease;
 }
+.icon-action-btn svg { width: 22px; height: 22px; stroke: currentColor; }
 .icon-action-btn:active { transform: scale(0.93); }
 .icon-action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .icon-export { background: #1565c0; }

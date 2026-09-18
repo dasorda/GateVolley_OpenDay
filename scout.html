@@ -120,9 +120,15 @@
 
         <!-- RIGA UNICA DI AZIONI: EXPORT / UNDO / NUOVA PARTITA -->
         <div class="action-icons-row">
-            <button class="icon-action-btn icon-export" onclick="exportCSV()" title="Esporta Report CSV (Excel)" aria-label="Esporta Report CSV">📥</button>
-            <button id="undo-btn" class="icon-action-btn icon-undo" onclick="undoLastAction()" title="Annulla Ultima Azione" aria-label="Annulla Ultima Azione" disabled>↩️</button>
-            <button id="new-match-btn" class="icon-action-btn icon-new" onclick="startNewMatch()" title="Inizia Nuova Partita" aria-label="Inizia Nuova Partita">🆕</button>
+            <button class="icon-action-btn icon-export" onclick="exportCSV()" title="Esporta Report CSV (Excel)" aria-label="Esporta Report CSV">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+            </button>
+            <button id="undo-btn" class="icon-action-btn icon-undo" onclick="undoLastAction()" title="Annulla Ultima Azione" aria-label="Annulla Ultima Azione" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-1"/></svg>
+            </button>
+            <button id="new-match-btn" class="icon-action-btn icon-new" onclick="startNewMatch()" title="Inizia Nuova Partita" aria-label="Inizia Nuova Partita">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            </button>
         </div>
     </div>
 </div>
