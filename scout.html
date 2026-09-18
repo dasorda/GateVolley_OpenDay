@@ -3,104 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GateVolley Scout - Live Statistics</title>
-    <!-- Collegamento al file CSS esterno per lo stile -->
+    <title>GateVolley Scout - Live</title>
+    <!-- Collegamento al foglio di stile esterno -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Intestazione e Configurazione Iniziale -->
-    <header class="app-header">
-        <h1>🏐 GateVolley Scout</h1>
-        <div class="setup-panel" id="setup-panel">
-            <input type="text" id="team-noi" placeholder="Nome Nostra Squadra" value="Noi">
-            <span class="vs-label">VS</span>
-            <input type="text" id="team-loro" placeholder="Avversari" value="Loro">
-            <button onclick="startMatchSession()" class="btn-primary">Inizia Partita</button>
+    <!-- PANNELLO SETUP INIZIALE (ORIGINALE) -->
+    <div id="setup-panel" class="container">
+        <h2>🏐 Configurazione Partita</h2>
+        <div style="margin-bottom: 15px;">
+            <label>ID Partita:</label>
+            <input type="text" id="input-match-id" placeholder="Es. GARA_01">
         </div>
-    </header>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <label>Squadra Casa (Noi):</label>
+                <input type="text" id="input-team-home" placeholder="Casa" value="Noi">
+            </div>
+            <div style="flex: 1;">
+                <label>Squadra Ospite (Loro):</label>
+                <input type="text" id="input-team-away" placeholder="Ospiti" value="Loro">
+            </div>
+        </div>
 
-    <!-- Tabellone Punteggio e Controlli Rapidi -->
-    <section class="scoreboard-section">
+        <h3>Formazione Iniziale (Numeri di maglia da P1 a P6)</h3>
+        <div class="formation-grid">
+            <div><label>P1 (Servizio):</label><input type="number" id="input-p1" placeholder="N°"></div>
+            <div><label>P2 (Avanti-Destra):</label><input type="number" id="input-p2" placeholder="N°"></div>
+            <div><label>P3 (Avanti-Centro):</label><input type="number" id="input-p3" placeholder="N°"></div>
+            <div><label>P4 (Avanti-Sinistra):</label><input type="number" id="input-p4" placeholder="N°"></div>
+            <div><label>P5 (Dietro-Sinistra):</label><input type="number" id="input-p5" placeholder="N°"></div>
+            <div><label>P6 (Dietro-Centro):</label><input type="number" id="input-p6" placeholder="N°"></div>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <label>Primo Servizio a:</label>
+            <label style="display:inline; margin-right:15px;">
+                <input type="radio" name="first-service" value="home" checked> Noi
+            </label>
+            <label style="display:inline;">
+                <input type="radio" name="first-service" value="away"> Loro
+            </label>
+        </div>
+
+        <button class="btn" style="margin-top: 20px; background-color: #27ae60;" onclick="confirmFormation()">Conferma e Inizia</button>
+    </div>
+
+    <!-- PANNELLO DI GIOCO LIVE (ORIGINALE CON INTEGRAZIONI) -->
+    <div id="scout-game-panel" class="container" style="display: none;">
+        <div class="header-match">
+            <span id="display-match-id">GARA</span> | Set <span id="current-set-display">1</span>
+        </div>
+
+        <!-- TABELLONE PUNTEGGIO -->
         <div class="scoreboard">
-            <div class="score-card team-home">
-                <h2 id="display-team-noi">Noi</h2>
-                <div class="score-value" id="val-score-noi">0</div>
-                <div class="score-buttons">
-                    <button onclick="changeScore('noi', 1)">+1</button>
-                    <button onclick="changeScore('noi', -1)">-1</button>
-                </div>
+            <div class="score-box">
+                <div class="team-name" id="display-name-home">Noi</div>
+                <div class="score-num" id="score-home">0</div>
+                <div class="set-counter">Set vinti: <span id="sets-home">0</span></div>
             </div>
-
-            <div class="match-info">
-                <div class="info-badge">Set <span id="display-current-set">1</span></div>
-                <div class="service-indicator" id="service-indicator">Servizio: -</div>
-                
-                <!-- Pulsanti di Controllo: UNDO e NUOVA PARTITA -->
-                <div class="system-controls">
-                    <button id="btn-undo" onclick="undoLastAction()" disabled class="btn-undo">↩️ Undo</button>
-                    <button id="btn-new" onclick="startNewMatch()" class="btn-danger">🗑️ Reset</button>
-                </div>
-            </div>
-
-            <div class="score-card team-away">
-                <h2 id="display-team-loro">Loro</h2>
-                <div class="score-value" id="val-score-loro">0</div>
-                <div class="score-buttons">
-                    <button onclick="changeScore('loro', 1)">+1</button>
-                    <button onclick="changeScore('loro', -1)">-1</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Il Campo da Gioco per lo Scouting Posizionale -->
-    <main class="court-container">
-        <div class="volleyball-court" id="court">
-            <!-- Le 6 posizioni standard della pallavolo sul campo -->
-            <div class="court-zone zone-4" onclick="selectZone(4)"><span>P4</span><div class="player-name" id="p-4">Giocatore 4</div></div>
-            <div class="court-zone zone-3" onclick="selectZone(3)"><span>P3</span><div class="player-name" id="p-3">Giocatore 3</div></div>
-            <div class="court-zone zone-2" onclick="selectZone(2)"><span>P2</span><div class="player-name" id="p-2">Giocatore 2</div></div>
-            <div class="court-zone zone-5" onclick="selectZone(5)"><span>P5</span><div class="player-name" id="p-5">Giocatore 5</div></div>
-            <div class="court-zone zone-6" onclick="selectZone(6)"><span>P6</span><div class="player-name" id="p-6">Giocatore 6</div></div>
-            <div class="court-zone zone-1" onclick="selectZone(1)"><span>P1</span><div class="player-name" id="p-1">Giocatore 1</div></div>
-        </div>
-    </main>
-
-    <!-- Pannello di Selezione Fondamentale e Voto -->
-    <section class="action-panel" id="action-panel" style="display: none;">
-        <h3 id="action-panel-title">Registra Azione per Giocatore</h3>
-        
-        <div class="panel-row">
-            <h4>Fondamentale:</h4>
-            <div class="button-group" id="group-fundamentals">
-                <button onclick="setFundamental('Battuta')">Battuta</button>
-                <button onclick="setFundamental('Ricezione')">Ricezione</button>
-                <button onclick="setFundamental('Alzata')">Alzata</button>
-                <button onclick="setFundamental('Attacco')">Attacco</button>
-                <button onclick="setFundamental('Muro')">Muro</button>
-                <button onclick="setFundamental('Difesa')">Difesa</button>
+            <div class="score-vs">VS</div>
+            <div class="score-box">
+                <div class="team-name" id="display-name-away">Loro</div>
+                <div class="score-num" id="score-away">0</div>
+                <div class="set-counter">Set vinti: <span id="sets-away">0</span></div>
             </div>
         </div>
 
-        <div class="panel-row">
-            <h4>Valutazione (Voto):</h4>
-            <div class="button-group" id="group-evaluations">
-                <button class="vote-err" onclick="setVote('=')">Error (=)</button>
-                <button class="vote-neg" onclick="setVote('-')">Negativo (-)</button>
-                <button class="vote-neu" onclick="setVote('!')">Neutro (!)</button>
-                <button class="vote-pos" onclick="setVote('+')">Positivo (+)</button>
-                <button class="vote-perf" onclick="setVote('#')">Perfetto (#)</button>
-            </div>
+        <div class="rally-info" id="rally-info-display">Rally: R_1 | Servizio: -</div>
+
+        <!-- CAMPO DA GIOCO GRAFICO -->
+        <div class="court">
+            <!-- Zona 4 -->
+            <button class="position-btn pos-4" onclick="selectPosition(4)">
+                <span class="pos-label">P4</span>
+                <span class="player-num" id="court-p4">-</span>
+            </button>
+            <!-- Zona 3 -->
+            <button class="position-btn pos-3" onclick="selectPosition(3)">
+                <span class="pos-label">P3</span>
+                <span class="player-num" id="court-p3">-</span>
+            </button>
+            <!-- Zona 2 -->
+            <button class="position-btn pos-2" onclick="selectPosition(2)">
+                <span class="pos-label">P2</span>
+                <span class="player-num" id="court-p2">-</span>
+            </button>
+            <!-- Zona 5 -->
+            <button class="position-btn pos-5" onclick="selectPosition(5)">
+                <span class="pos-label">P5</span>
+                <span class="player-num" id="court-p5">-</span>
+            </button>
+            <!-- Zona 6 -->
+            <button class="position-btn pos-6" onclick="selectPosition(6)">
+                <span class="pos-label">P6</span>
+                <span class="player-num" id="court-p6">-</span>
+            </button>
+            <!-- Zona 1 -->
+            <button class="position-btn pos-1" onclick="selectPosition(1)">
+                <span class="pos-label">P1</span>
+                <span class="player-num" id="court-p1">-</span>
+            </button>
         </div>
-    </section>
 
-    <!-- Barra di Esportazione CSV in fondo alla pagina -->
-    <footer class="app-footer">
-        <button onclick="exportToCSV()" class="btn-success">📥 Esporta Statistiche (CSV)</button>
-    </footer>
+        <!-- TASTI RAPIDI PUNTI DIRETTI (E / P) -->
+        <div class="direct-points">
+            <button class="direct-btn btn-err" onclick="addDirectPoint('home', 'ERRORE_AVVERSARIO', 'E')">E (Punto Noi)</button>
+            <button class="direct-btn btn-pt" onclick="addDirectPoint('away', 'PUNTO_AVVERSARIO', 'P')">P (Punto Loro)</button>
+        </div>
 
-    <!-- Collegamento alla logica JavaScript esterna -->
+        <!-- SELEZIONE FONDAMENTALI -->
+        <div class="section-title">Seleziona Fondamentale:</div>
+        <div class="skills-grid">
+            <button class="btn-skill" onclick="selectSkill('S', 'Battuta')">S (Battuta)</button>
+            <button class="btn-skill" onclick="selectSkill('R', 'Ricezione')">R (Ricezione)</button>
+            <button class="btn-skill" onclick="selectSkill('A', 'Attacco')">A (Attacco)</button>
+            <button class="btn-skill" onclick="selectSkill('B', 'Muro')">B (Muro)</button>
+        </div>
+
+        <!-- SELEZIONE VOTI -->
+        <div class="section-title">Valutazione:</div>
+        <div class="votes-row">
+            <button class="vote-btn v-err" onclick="pressVote('=')">=</button>
+            <button class="vote-btn v-minus" onclick="pressVote('-')">-</button>
+            <button class="vote-btn v-slash" onclick="pressVote('!')">!</button>
+            <button class="vote-btn v-plus" onclick="pressVote('+')">+</button>
+            <button class="vote-btn v-hash" onclick="pressVote('#')">#</button>
+        </div>
+
+        <!-- CRONOLOGIA AZIONI LIVE -->
+        <div class="section-title">Cronologia Azioni (Log):</div>
+        <div id="log-container" class="log-container">
+            <div style="color: #7f8c8d; font-style: italic;">Nessuna azione registrata.</div>
+        </div>
+
+        <!-- COMANDI DI GESTIONE E NUOVI TASTI UNDO / RESET -->
+        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <button class="export-btn" onclick="exportCSV()">📥 Esporta Dati (CSV)</button>
+            <button id="undo-btn" class="export-btn" onclick="undoLastAction()" style="background-color: #f39c12;" disabled>↩️ Annulla Ultima Azione</button>
+            <button id="new-match-btn" class="export-btn" onclick="startNewMatch()" style="background-color: #c0392b;">🗑️ Inizia Nuova Partita</button>
+        </div>
+    </div>
+
+    <!-- Collegamento alla logica di gioco esterna -->
     <script src="app.js"></script>
 </body>
 </html>
